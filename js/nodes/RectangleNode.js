@@ -1,5 +1,7 @@
 import GraphicObject from "./GraphicObject.js";
 
+
+
 export default class RectangleNode extends GraphicObject {
 
     constructor(options = {}) {

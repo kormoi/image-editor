@@ -1,3 +1,6 @@
+import MoveNodeCommand from "../history/commands/MoveNodeCommand.js";
+
+
 export default class Renderer {
 
     constructor(editor) {
@@ -44,9 +47,12 @@ export default class Renderer {
 
             this.resize();
 
+
         });
 
         const canvas = this.canvas;
+        
+        let moveStart = null;
 
         canvas.on("mouse:down", (e) => {
 
@@ -93,6 +99,68 @@ export default class Renderer {
                 tool.onDoubleClick(e);
 
             }
+
+        });
+
+        canvas.on("object:moving", (e) => {
+
+            const object = e.target;
+
+            if (!object?.node) {
+
+                return;
+
+            }
+
+            if (!moveStart) {
+
+                moveStart = {
+
+                    ...object.node.transform
+
+                };
+
+            }
+
+        });
+
+        canvas.on("object:modified", (e) => {
+
+            const object = e.target;
+
+            if (!object?.node) {
+
+                return;
+
+            }
+
+            const node = object.node;
+
+            const newTransform = {
+
+                ...node.transform,
+
+                x: object.left,
+
+                y: object.top
+
+            };
+
+            this.editor.history.execute(
+
+                new MoveNodeCommand(
+
+                    node,
+
+                    moveStart,
+
+                    newTransform
+
+                )
+
+            );
+
+            moveStart = null;
 
         });
 
@@ -222,29 +290,35 @@ export default class Renderer {
 
     drawRectangle(node) {
 
-    const rect = new fabric.Rect({
+        const rect = new fabric.Rect({
 
-        left: node.transform.x,
+            left: node.transform.x,
 
-        top: node.transform.y,
+            top: node.transform.y,
 
-        width: node.transform.width,
+            width: node.transform.width,
 
-        height: node.transform.height,
+            height: node.transform.height,
 
-        fill: node.style.fill,
+            fill: node.style.fill,
 
-        stroke: node.style.stroke,
+            stroke: node.style.stroke,
 
-        strokeWidth: node.style.strokeWidth
+            strokeWidth: node.style.strokeWidth
 
-    });
+        });
 
-    rect.node = node;
+        rect.node = node;
 
-    this.canvas.add(rect);
+        rect.hasControls = true;
 
-}
+        rect.hasBorders = true;
+
+        rect.objectCaching = false;
+
+        this.canvas.add(rect);
+
+    }
 
     drawEllipse(node) {
 

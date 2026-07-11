@@ -166,6 +166,40 @@ export default class Editor {
 
         });
 
+        window.addEventListener("keydown", (e) => {
+
+            const ctrl = e.ctrlKey || e.metaKey;
+
+            if (!ctrl) {
+
+                return;
+
+            }
+
+            if (e.key.toLowerCase() === "z") {
+
+                e.preventDefault();
+
+                if (e.shiftKey) {
+
+                    this.history.redo();
+
+                } else {
+
+                    this.history.undo();
+
+                }
+
+            } else if (e.key.toLowerCase() === "y") {
+
+                e.preventDefault();
+
+                this.history.redo();
+
+            }
+
+        });
+
     }
 
     onResize() {
