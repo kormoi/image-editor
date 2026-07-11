@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editor V2</title>
+
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/toolbar.css">
+    <link rel="stylesheet" href="css/panels.css">
+    <link rel="stylesheet" href="css/canvas.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/command.css">
+
+    <!-- Fabric.js -->
+
+    <script src="https://cdn.jsdelivr.net/npm/fabric@6.7.1/dist/index.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="editor">
+
+    <!-- ========================================================= -->
+    <!-- Header -->
+    <!-- ========================================================= -->
+
+    <header id="app-header">
+
+        <div class="header-left">
+
+            <div id="logo">
+                Editor V2
+            </div>
+
+            <input
+                    id="project-name"
+                    type="text"
+                    value="Untitled Project">
+
+        </div>
+
+        <div class="header-right">
+
+            <button id="btnUndo">Undo</button>
+
+            <button id="btnRedo">Redo</button>
+
+            <button id="btnSave">Save</button>
+
+            <button id="btnExport">Export</button>
+
+        </div>
+
+    </header>
+
+    <!-- ========================================================= -->
+    <!-- Toolbar -->
+    <!-- ========================================================= -->
+
+    <nav id="toolbar">
+
+        <button data-tool="select">Select</button>
+
+        <button data-tool="node">Node</button>
+
+        <button data-tool="pen">Pen</button>
+
+        <button data-tool="rectangle">Rectangle</button>
+
+        <button data-tool="ellipse">Ellipse</button>
+
+        <button data-tool="text">Text</button>
+
+        <button data-tool="image">Image</button>
+
+        <button data-tool="crop">Crop</button>
+
+        <button data-tool="brush">Brush</button>
+
+        <button data-tool="eraser">Eraser</button>
+
+    </nav>
+
+    <!-- ========================================================= -->
+    <!-- Workspace -->
+    <!-- ========================================================= -->
+
+    <main id="workspace">
+
+        <!-- LEFT DOCK -->
+
+        <aside
+                id="left-dock"
+                class="dock">
+
+            <div class="dock-header">
+
+                <span>Library</span>
+
+                <button class="collapse-button">
+                    ◀
+                </button>
+
+            </div>
+
+            <div id="left-panel-container">
+
+                <!-- Panels injected here -->
+
+            </div>
+
+        </aside>
+
+        <!-- LEFT SPLITTER -->
+
+        <div
+                id="left-splitter"
+                class="splitter">
+        </div>
+
+        <!-- CANVAS -->
+
+        <section id="canvas-area">
+
+            <div id="canvas-container">
+
+                <canvas id="editor-canvas"></canvas>
+
+            </div>
+
+        </section>
+
+        <!-- RIGHT SPLITTER -->
+
+        <div
+                id="right-splitter"
+                class="splitter">
+        </div>
+
+        <!-- RIGHT DOCK -->
+
+        <aside
+                id="right-dock"
+                class="dock">
+
+            <div class="dock-header">
+
+                <span>Properties</span>
+
+                <button class="collapse-button">
+                    ▶
+                </button>
+
+            </div>
+
+            <div id="right-panel-container">
+
+                <!-- Panels injected here -->
+
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- ========================================================= -->
+    <!-- Status Bar -->
+    <!-- ========================================================= -->
+
+    <footer id="statusbar">
+
+        <div id="status-left">
+
+            Ready
+
+        </div>
+
+        <div id="status-right">
+
+            <span id="tool-name">
+
+                Select
+
+            </span>
+
+            |
+
+            <span id="zoom-level">
+
+                100%
+
+            </span>
+
+        </div>
+
+    </footer>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- Command Palette -->
+<!-- ========================================================= -->
+
+<div id="command-palette"
+     class="hidden">
+
+    <input
+            id="command-input"
+            type="text"
+            placeholder="Type a command...">
+
+    <div id="command-results">
+
+    </div>
+
+</div>
+
+<script type="module"
+        src="js/app.js">
+</script>
+
+</body>
+
+</html>

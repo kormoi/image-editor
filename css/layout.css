@@ -1,0 +1,264 @@
+/* ==========================================================
+   RESET
+========================================================== */
+
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+
+
+/* ==========================================================
+   ROOT EDITOR
+========================================================== */
+
+#editor{
+
+    width:100vw;
+    height:100vh;
+
+    display:grid;
+
+    grid-template-rows:
+        50px    /* Header */
+        44px    /* Toolbar */
+        1fr     /* Workspace */
+        28px;   /* Status */
+
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+#app-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 16px;
+
+}
+
+
+/* ==========================================================
+   TOOLBAR
+========================================================== */
+
+#toolbar{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:0 10px;
+
+}
+
+
+/* ==========================================================
+   WORKSPACE
+========================================================== */
+
+#workspace{
+
+    display:grid;
+
+    grid-template-columns:
+
+        300px    /* Left Dock */
+
+        6px      /* Splitter */
+
+        1fr      /* Canvas */
+
+        6px      /* Splitter */
+
+        340px;   /* Right Dock */
+
+    overflow:hidden;
+
+}
+
+
+/* ==========================================================
+   DOCKS
+========================================================== */
+
+.dock{
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    min-width:180px;
+
+}
+
+
+/* ==========================================================
+   DOCK HEADER
+========================================================== */
+
+.dock-header{
+
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 12px;
+
+    flex-shrink:0;
+
+}
+
+
+/* ==========================================================
+   PANEL CONTAINERS
+========================================================== */
+
+#left-panel-container,
+#right-panel-container{
+
+    flex:1;
+
+    overflow:auto;
+
+}
+
+
+/* ==========================================================
+   SPLITTER
+========================================================== */
+
+.splitter{
+
+    cursor:col-resize;
+
+    user-select:none;
+
+}
+
+
+/* ==========================================================
+   CANVAS
+========================================================== */
+
+#canvas-area{
+
+    position:relative;
+
+    overflow:hidden;
+
+    display:flex;
+
+}
+
+
+#canvas-container{
+
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+}
+
+
+#editor-canvas{
+
+    display:block;
+
+}
+
+
+/* ==========================================================
+   STATUS BAR
+========================================================== */
+
+#statusbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 12px;
+
+}
+
+
+/* ==========================================================
+   COMMAND PALETTE
+========================================================== */
+
+#command-palette{
+
+    position:fixed;
+
+    top:120px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:700px;
+
+    max-width:90vw;
+
+    z-index:10000;
+
+}
+
+
+#command-input{
+
+    width:100%;
+
+    height:48px;
+
+    padding:0 18px;
+
+    font-size:18px;
+
+}
+
+
+#command-results{
+
+    max-height:400px;
+
+    overflow:auto;
+
+}
+
+
+.hidden{
+
+    display:none !important;
+
+}
