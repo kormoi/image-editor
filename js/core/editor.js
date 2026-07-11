@@ -4,7 +4,7 @@ import ToolManager from "../tools/ToolManager.js";
 import SelectionTool from "../tools/SelectionTool.js";
 import RectangleTool from "../tools/RectangleTool.js";
 import EventBus from "./eventBus.js";
-import History from "./History.js";
+import History from "../history/History.js";
 
 
 export default class Editor {
