@@ -48,7 +48,7 @@ export default class History {
 
         const command = this.redoStack.pop();
 
-        command.execute();
+        command.redo();
 
         this.undoStack.push(command);
 

@@ -1,16 +1,22 @@
-export default class AddNodeCommand {
+import Command from "./Command.js";
 
-    constructor(document, node) {
+export default class AddNodeCommand extends Command {
+
+    constructor(document, node, parent = null) {
+
+        super();
 
         this.document = document;
 
         this.node = node;
 
+        this.parent = parent;
+
     }
 
     execute() {
 
-        this.document.addNode(this.node);
+        this.document.addNode(this.node, this.parent);
 
     }
 
