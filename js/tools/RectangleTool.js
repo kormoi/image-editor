@@ -18,6 +18,7 @@ export default class RectangleTool extends Tool {
         this.isDrawing = false;
 
         this.startX = 0;
+
         this.startY = 0;
 
         this.preview = null;
@@ -32,7 +33,16 @@ export default class RectangleTool extends Tool {
 
     }
 
-    onMouseDown(pointer) {
+    onMouseDown(event) {
+
+        // Don't start drawing if an existing object was clicked.
+        if (event.target) {
+
+            return;
+
+        }
+
+        const pointer = event.pointer;
 
         this.isDrawing = true;
 
@@ -42,21 +52,21 @@ export default class RectangleTool extends Tool {
         this.preview = new fabric.Rect({
 
             left: pointer.x,
-
             top: pointer.y,
 
             width: 1,
-
             height: 1,
 
-            fill: "#4F9CFF55",
+            fill: fabric.Color
+                .fromHex(this.editor.colors.fill)
+                .setAlpha(0.3)
+                .toRgba(),
 
-            stroke: "#4F9CFF",
+            stroke: this.editor.colors.stroke,
 
-            strokeWidth: 1,
+            strokeWidth: this.editor.colors.strokeWidth,
 
             selectable: false,
-
             evented: false
 
         });
@@ -115,7 +125,13 @@ export default class RectangleTool extends Tool {
 
             width,
 
-            height
+            height,
+
+            fill: this.editor.colors.fill,
+
+            stroke: this.editor.colors.stroke,
+
+            strokeWidth: this.editor.colors.strokeWidth
 
         });
 

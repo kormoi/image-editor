@@ -18,11 +18,14 @@ export default class RectangleNode extends GraphicObject {
 
         this.transform.rotation = options.rotation ?? 0;
 
-        this.fill = options.fill ?? "#4A90E2";
+        this.style.fill = options.fill ?? "#ffffff";
 
-        this.stroke = options.stroke ?? "#000000";
+        this.style.stroke = options.stroke ?? "#2C6BD9";
 
-        this.strokeWidth = options.strokeWidth ?? 1;
+        this.style.strokeWidth = options.strokeWidth ?? 1;
+
+        console.log("RectangleNode:", options);
+        console.log("Style:", this.style);
 
         this.radius = options.radius ?? 0;
 

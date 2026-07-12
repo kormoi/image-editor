@@ -16,7 +16,9 @@ export default class AddNodeCommand extends Command {
 
     execute() {
 
-        this.document.addNode(this.node, this.parent);
+        const parent = this.parent || this.document.getActiveLayer();
+
+        this.document.addNode(this.node, parent);
 
     }
 

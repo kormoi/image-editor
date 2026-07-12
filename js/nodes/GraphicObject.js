@@ -1,44 +1,10 @@
-export default class GraphicObject {
+import Node from "./Node.js";
+
+export default class GraphicObject extends Node {
 
     constructor(type) {
 
-        this.id = crypto.randomUUID();
-
-        this.type = type;
-
-        this.name = "";
-
-        this.visible = true;
-
-        this.locked = false;
-
-        this.selected = false;
-
-        this.opacity = 1;
-
-        this.blendMode = "normal";
-
-        this.transform = {
-
-            x: 0,
-
-            y: 0,
-
-            width: 0,
-
-            height: 0,
-
-            rotation: 0,
-
-            scaleX: 1,
-
-            scaleY: 1,
-
-            flipX: false,
-
-            flipY: false
-
-        };
+        super(type);
 
         this.style = {
 

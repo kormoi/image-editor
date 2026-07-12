@@ -1,4 +1,4 @@
-import Editor from "./core/editor.js";
+import Editor from "./core/Editor.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
 

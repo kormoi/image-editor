@@ -72,6 +72,63 @@ export default class Document {
 
     }
 
+    setArtboardSize(width, height) {
+
+        const artboard = this.getActiveArtboard();
+
+        if (!artboard) return;
+
+        artboard.transform.width = width;
+        artboard.transform.height = height;
+
+        this.editor.renderer.render();
+
+    }
+
+    setArtboardBackground(background) {
+
+        const artboard = this.getActiveArtboard();
+
+        if (!artboard) return;
+
+        artboard.background = structuredClone(background);
+
+        this.editor.renderer.render();
+
+    }
+
+    renameArtboard(name) {
+
+        const artboard = this.getActiveArtboard();
+
+        if (!artboard) return;
+
+        artboard.name = name;
+
+    }
+
+    selectNode(node) {
+
+        this.clearSelection();
+
+        node.selected = true;
+
+        this.selectedNode = node;
+
+    }
+
+    clearSelection() {
+
+        if (this.selectedNode) {
+
+            this.selectedNode.selected = false;
+
+        }
+
+        this.selectedNode = null;
+
+    }
+
     getActiveLayer() {
 
         return this.activeLayer;

@@ -41,6 +41,16 @@ export default class Renderer {
 
     }
 
+    setBackground(color) {
+
+        if (!this.canvas) return;
+
+        this.canvas.backgroundColor = color;
+
+        this.canvas.requestRenderAll();
+
+    }
+
     bindEvents() {
 
         window.addEventListener("resize", () => {
@@ -51,16 +61,23 @@ export default class Renderer {
         });
 
         const canvas = this.canvas;
-        
-        let moveStart = null;
+
+        const moveStart = new Map();
 
         canvas.on("mouse:down", (e) => {
 
             const tool = this.editor.tools.getActive();
 
-            if (tool && tool.name !== "select" && tool.onMouseDown) {
 
-                tool.onMouseDown(e.pointer);
+            if (e.target) {
+
+                return;
+
+            }
+
+            if (tool && tool.name !== "select" && tool.onMouseDown) {
+                console.log("Active tool:", tool.name);
+                tool.onMouseDown(e);
 
             }
 
@@ -106,19 +123,17 @@ export default class Renderer {
 
             const object = e.target;
 
-            if (!object?.node) {
+            if (!object?.node) return;
 
-                return;
+            if (!moveStart.has(object.node.id)) {
 
-            }
+                moveStart.set(
 
-            if (!moveStart) {
+                    object.node.id,
 
-                moveStart = {
+                    structuredClone(object.node.transform)
 
-                    ...object.node.transform
-
-                };
+                );
 
             }
 
@@ -128,20 +143,17 @@ export default class Renderer {
 
             const object = e.target;
 
-            if (!object?.node) {
-
-                return;
-
-            }
+            if (!object?.node) return;
 
             const node = object.node;
+
+            const oldTransform = moveStart.get(node.id);
 
             const newTransform = {
 
                 ...node.transform,
 
                 x: object.left,
-
                 y: object.top
 
             };
@@ -152,7 +164,7 @@ export default class Renderer {
 
                     node,
 
-                    moveStart,
+                    oldTransform,
 
                     newTransform
 
@@ -160,7 +172,7 @@ export default class Renderer {
 
             );
 
-            moveStart = null;
+            moveStart.delete(node.id);
 
         });
 
@@ -172,6 +184,12 @@ export default class Renderer {
 
         if (!artboard) return;
 
+        if (artboard.background.type === "transparent") {
+
+            this.drawCheckerboard();
+
+        }
+
         this.artboard = new fabric.Rect({
 
             left: 0,
@@ -182,11 +200,23 @@ export default class Renderer {
 
             height: artboard.height,
 
-            fill: artboard.background,
+            fill: this.getArtboardFill(artboard),
 
             stroke: "#d0d0d0",
 
             strokeWidth: 1,
+
+            shadow: new fabric.Shadow({
+
+                color: "rgba(0,0,0,0.15)",
+
+                blur: 20,
+
+                offsetX: 0,
+
+                offsetY: 4
+
+            }),
 
             selectable: false,
 
@@ -210,12 +240,47 @@ export default class Renderer {
 
         });
 
+        this.artboard.node = artboard;
+
         this.canvas.add(this.artboard);
 
         this.centerArtboard();
 
     }
 
+    drawCheckerboard() {
+
+        // TODO
+
+    }
+
+    getArtboardFill(artboard) {
+
+        switch (artboard.background.type) {
+
+            case "transparent":
+
+                return "transparent";
+
+            case "solid":
+
+                return artboard.background.color;
+
+            case "gradient":
+
+                return this.createGradient(artboard);
+
+        }
+
+    }
+
+    createGradient(artboard) {
+
+        // We'll implement this later.
+
+        return "#ffffff";
+
+    }
     centerArtboard() {
 
         if (!this.artboard) return;
@@ -246,7 +311,11 @@ export default class Renderer {
 
         });
 
-        this.centerArtboard();
+        if (this.artboard) {
+
+            this.centerArtboard();
+
+        }
 
         this.canvas.requestRenderAll();
 
@@ -254,9 +323,17 @@ export default class Renderer {
 
     renderDocument() {
 
-        this.canvas.clear();
+        const objects = this.canvas.getObjects().slice();
 
-        this.createArtboard();
+        objects.forEach(object => {
+
+            if (object !== this.artboard) {
+
+                this.canvas.remove(object);
+
+            }
+
+        });
 
         this.editor.document.traverse(node => {
 
@@ -309,12 +386,6 @@ export default class Renderer {
         });
 
         rect.node = node;
-
-        rect.hasControls = true;
-
-        rect.hasBorders = true;
-
-        rect.objectCaching = false;
 
         this.canvas.add(rect);
 
@@ -377,6 +448,11 @@ export default class Renderer {
     }
 
     render() {
+
+        console.log("Renderer.render()");
+        console.log("Viewport background:", this.editor.viewport.workspace.background);
+
+        this.editor.viewport.applyBackground();
 
         this.renderDocument();
 

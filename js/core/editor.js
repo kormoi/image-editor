@@ -1,10 +1,13 @@
-import Renderer from "../canvas/renderer.js";
+import Renderer from "../canvas/Renderer.js";
 import Document from "./document.js";
 import ToolManager from "../tools/ToolManager.js";
 import SelectionTool from "../tools/SelectionTool.js";
 import RectangleTool from "../tools/RectangleTool.js";
 import EventBus from "./eventBus.js";
 import History from "../history/History.js";
+import Viewport from "./Viewport.js";
+import SelectionManager from "./SelectionManager.js";
+
 
 
 export default class Editor {
@@ -31,6 +34,16 @@ export default class Editor {
         this.project = null;
         this.panels = null;
         this.ui = null;
+        this.viewport = null;
+        this.colors = {
+
+            fill: "#47daff",
+
+            stroke: "#000000",
+
+            strokeWidth: 1
+
+        };
 
         // DOM References
 
@@ -49,8 +62,10 @@ export default class Editor {
         // These modules will be added one by one
         await this.initializeEventBus();
         await this.initializeDocument();
+        await this.initializeSelection();
         await this.initializeHistory();
         await this.initializeRenderer();
+        await this.initializeViewport();
         // await this.initializeLibrary();
         // await this.initializePanels();
         await this.initializeTools();
@@ -66,6 +81,15 @@ export default class Editor {
         console.groupEnd();
 
     }
+
+    async initializeSelection() {
+
+        this.selection = new SelectionManager(this);
+
+        console.log("✔ Selection");
+
+    }
+
     async initializeTools() {
 
         this.tools = new ToolManager(this);
@@ -104,6 +128,19 @@ export default class Editor {
         this.renderer.initialize();
 
         this.updateStatus("Canvas Ready");
+
+    }
+    async initializeViewport() {
+
+        this.viewport = new Viewport(this);
+
+        this.viewport.initialize();
+
+        this.viewport.applyBackground();
+
+        this.updateStatus("Viewport Ready");
+
+        console.log("✔ Viewport");
 
     }
     async initializeEventBus() {

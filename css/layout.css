@@ -262,3 +262,9 @@ body{
     display:none !important;
 
 }
+
+
+#toolbar button.active {
+    background: #4F9CFF;
+    color: white;
+}
