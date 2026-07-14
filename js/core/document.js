@@ -173,6 +173,24 @@ export default class Document {
 
     }
 
+    findNode(id) {
+
+        let result = null;
+
+        this.traverse(node => {
+
+            if (node.id === id) {
+
+                result = node;
+
+            }
+
+        });
+
+        return result;
+
+    }
+
     findById(id) {
 
         let result = null;

@@ -1,6 +1,6 @@
 import Tool from "./Tool.js";
 import RectangleNode from "../nodes/RectangleNode.js";
-import AddNodeCommand from "../history/commands/AddNodeCommand.js";
+
 
 
 
@@ -135,17 +135,7 @@ export default class RectangleTool extends Tool {
 
         });
 
-        this.editor.history.execute(
-
-            new AddNodeCommand(
-
-                this.editor.document,
-
-                node
-
-            )
-
-        );
+        this.editor.document.addNode(node);
 
         this.editor.renderer.render();
 

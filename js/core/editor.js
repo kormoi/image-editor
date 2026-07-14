@@ -4,9 +4,11 @@ import ToolManager from "../tools/ToolManager.js";
 import SelectionTool from "../tools/SelectionTool.js";
 import RectangleTool from "../tools/RectangleTool.js";
 import EventBus from "./eventBus.js";
-import History from "../history/History.js";
+import History from "./History.js";
 import Viewport from "./Viewport.js";
-import SelectionManager from "./SelectionManager.js";
+import Selection from "./Selection.js";
+import Transform from "./Transform.js";
+
 
 
 
@@ -27,6 +29,7 @@ export default class Editor {
         this.document = null;
         this.history = null;
         this.selection = null;
+        this.transform = null;
         this.library = null;
         this.commands = null;
         this.tools = null;
@@ -64,6 +67,7 @@ export default class Editor {
         await this.initializeDocument();
         await this.initializeSelection();
         await this.initializeHistory();
+        await this.initializeTransform();
         await this.initializeRenderer();
         await this.initializeViewport();
         // await this.initializeLibrary();
@@ -84,9 +88,17 @@ export default class Editor {
 
     async initializeSelection() {
 
-        this.selection = new SelectionManager(this);
+        this.selection = new Selection(this);
 
         console.log("✔ Selection");
+
+    }
+
+    async initializeTransform() {
+
+        this.transform = new Transform(this);
+
+        console.log("✔ Transform");
 
     }
 

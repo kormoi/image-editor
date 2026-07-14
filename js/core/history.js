@@ -4,43 +4,53 @@ export default class History {
 
         this.editor = editor;
 
-        this.undoStack = [];
+        this.steps = [];
 
-        this.redoStack = [];
+        this.currentStep = -1;
 
         this.maxSteps = 100;
 
     }
 
-    execute(command) {
+    addStep(step) {
 
-        command.execute();
+        if (!step) return;
 
-        this.undoStack.push(command);
+        while (this.steps.length - 1 > this.currentStep) {
 
-        this.redoStack.length = 0;
-
-        if (this.undoStack.length > this.maxSteps) {
-
-            this.undoStack.shift();
+            this.steps.pop();
 
         }
+
+        if (this.steps.length >= this.maxSteps) {
+
+            this.steps.shift();
+
+            this.currentStep--;
+
+        }
+
+        step.number = this.currentStep + 1;
+
+        this.steps.push(step);
+
+        this.currentStep++;
 
     }
 
     undo() {
 
-        if (!this.undoStack.length) {
+        if (this.currentStep < 0) {
 
             return;
 
         }
 
-        const command = this.undoStack.pop();
+        const step = this.steps[this.currentStep];
 
-        command.undo();
+        this.applyStep(step, "before");
 
-        this.redoStack.push(command);
+        this.currentStep--;
 
         this.editor.renderer.render();
 
@@ -48,27 +58,59 @@ export default class History {
 
     redo() {
 
-        if (!this.redoStack.length) {
+        if (this.currentStep >= this.steps.length - 1) {
 
             return;
 
         }
 
-        const command = this.redoStack.pop();
+        this.currentStep++;
 
-        command.execute();
+        const step = this.steps[this.currentStep];
 
-        this.undoStack.push(command);
+        this.applyStep(step, "after");
 
         this.editor.renderer.render();
 
     }
 
+    applyStep(step, state) {
+
+        if (!step.changes) {
+
+            return;
+
+        }
+
+        step.changes.forEach(change => {
+
+            const node = this.editor.document.findNode(change.nodeId);
+
+            if (!node) {
+
+                return;
+
+            }
+
+            switch (change.property) {
+
+                case "transform":
+
+                    node.transform = structuredClone(change[state]);
+
+                    break;
+
+            }
+
+        });
+
+    }
+
     clear() {
 
-        this.undoStack.length = 0;
+        this.steps.length = 0;
 
-        this.redoStack.length = 0;
+        this.currentStep = -1;
 
     }
 

@@ -1,4 +1,3 @@
-import MoveNodeCommand from "../history/commands/MoveNodeCommand.js";
 
 
 export default class Renderer {
@@ -62,24 +61,70 @@ export default class Renderer {
 
         const canvas = this.canvas;
 
-        const moveStart = new Map();
-
-        canvas.on("mouse:down", (e) => {
-
-            const tool = this.editor.tools.getActive();
+        let transforming = false;
 
 
-            if (e.target) {
+        canvas.on("mouse:down", () => {
+
+            const active = canvas.getActiveObjects();
+
+            if (!active.length) {
 
                 return;
 
             }
 
-            if (tool && tool.name !== "select" && tool.onMouseDown) {
-                console.log("Active tool:", tool.name);
-                tool.onMouseDown(e);
+            transforming = true;
+
+            this.editor.transform.begin(active);
+
+        });
+
+        canvas.on("object:moving", () => {
+
+            if (!transforming) {
+
+                return;
 
             }
+
+            this.editor.transform.update(
+
+                canvas.getActiveObjects()
+
+            );
+
+        });
+
+        canvas.on("object:scaling", () => {
+
+            if (!transforming) {
+
+                return;
+
+            }
+
+            this.editor.transform.update(
+
+                canvas.getActiveObjects()
+
+            );
+
+        });
+
+        canvas.on("object:rotating", () => {
+
+            if (!transforming) {
+
+                return;
+
+            }
+
+            this.editor.transform.update(
+
+                canvas.getActiveObjects()
+
+            );
 
         });
 
@@ -95,15 +140,23 @@ export default class Renderer {
 
         });
 
-        canvas.on("mouse:up", (e) => {
+        canvas.on("mouse:up", () => {
 
-            const tool = this.editor.tools.getActive();
+            if (!transforming) {
 
-            if (tool && tool.name !== "select" && tool.onMouseUp) {
-
-                tool.onMouseUp(e.pointer);
+                return;
 
             }
+
+            transforming = false;
+
+            const step = this.editor.transform.finish(
+
+                canvas.getActiveObjects()
+
+            );
+
+            this.editor.history.addStep(step);
 
         });
 
@@ -119,62 +172,6 @@ export default class Renderer {
 
         });
 
-        canvas.on("object:moving", (e) => {
-
-            const object = e.target;
-
-            if (!object?.node) return;
-
-            if (!moveStart.has(object.node.id)) {
-
-                moveStart.set(
-
-                    object.node.id,
-
-                    structuredClone(object.node.transform)
-
-                );
-
-            }
-
-        });
-
-        canvas.on("object:modified", (e) => {
-
-            const object = e.target;
-
-            if (!object?.node) return;
-
-            const node = object.node;
-
-            const oldTransform = moveStart.get(node.id);
-
-            const newTransform = {
-
-                ...node.transform,
-
-                x: object.left,
-                y: object.top
-
-            };
-
-            this.editor.history.execute(
-
-                new MoveNodeCommand(
-
-                    node,
-
-                    oldTransform,
-
-                    newTransform
-
-                )
-
-            );
-
-            moveStart.delete(node.id);
-
-        });
 
     }
 
@@ -321,8 +318,22 @@ export default class Renderer {
 
     }
 
+    findFabricObject(node) {
+
+        return this.canvas
+            .getObjects()
+            .find(object => object.node === node);
+
+    }
+
     renderDocument() {
 
+        // 1. Remember selected nodes
+        const selectedNodes = this.canvas
+            .getActiveObjects()
+            .map(object => object.node);
+
+        // 2. Remove old Fabric objects
         const objects = this.canvas.getObjects().slice();
 
         objects.forEach(object => {
@@ -335,32 +346,50 @@ export default class Renderer {
 
         });
 
+        // 3. Draw new Fabric objects
         this.editor.document.traverse(node => {
 
             switch (node.type) {
 
                 case "rectangle":
-
                     this.drawRectangle(node);
-
                     break;
 
                 case "ellipse":
-
                     this.drawEllipse(node);
-
                     break;
 
                 case "text":
-
                     this.drawText(node);
-
                     break;
 
             }
 
         });
 
+        // 4. Find the NEW Fabric objects
+        const selectedObjects = selectedNodes
+            .map(node => this.findFabricObject(node))
+            .filter(Boolean);
+
+        // 5. Restore selection
+        if (selectedObjects.length === 1) {
+
+            this.canvas.setActiveObject(selectedObjects[0]);
+
+        } else if (selectedObjects.length > 1) {
+
+            const selection = new fabric.ActiveSelection(selectedObjects, {
+
+                canvas: this.canvas
+
+            });
+
+            this.canvas.setActiveObject(selection);
+
+        }
+
+        // 6. Render
         this.canvas.requestRenderAll();
 
     }
