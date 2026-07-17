@@ -1,10 +1,6 @@
 import Tool from "./Tool.js";
 import RectangleNode from "../nodes/RectangleNode.js";
 
-
-
-
-
 export default class RectangleTool extends Tool {
 
     constructor(editor) {
@@ -12,13 +8,11 @@ export default class RectangleTool extends Tool {
         super(editor);
 
         this.name = "rectangle";
-
         this.cursor = "crosshair";
 
         this.isDrawing = false;
 
         this.startX = 0;
-
         this.startY = 0;
 
         this.preview = null;
@@ -27,105 +21,40 @@ export default class RectangleTool extends Tool {
 
     activate() {
 
-        super.activate();
+        this.active = true;
 
-        this.editor.renderer.canvas.selection = false;
+        this.editor.renderer.canvas.style.cursor = this.cursor;
+
+    }
+
+    deactivate() {
+
+        this.active = false;
+
+        this.editor.renderer.canvas.style.cursor = "default";
 
     }
 
     onMouseDown(event) {
 
-        // Don't start drawing if an existing object was clicked.
-        if (event.target) {
-
-            return;
-
-        }
-
-        const pointer = event.pointer;
+        if (event.target) return;
 
         this.isDrawing = true;
 
-        this.startX = pointer.x;
-        this.startY = pointer.y;
+        this.startX = event.x;
+        this.startY = event.y;
 
-        this.preview = new fabric.Rect({
+        this.preview = {
 
-            left: pointer.x,
-            top: pointer.y,
+            type: "rectangle",
 
-            width: 1,
-            height: 1,
+            x: this.startX,
 
-            fill: fabric.Color
-                .fromHex(this.editor.colors.fill)
-                .setAlpha(0.3)
-                .toRgba(),
+            y: this.startY,
 
-            stroke: this.editor.colors.stroke,
+            width: 0,
 
-            strokeWidth: this.editor.colors.strokeWidth,
-
-            selectable: false,
-            evented: false
-
-        });
-
-        this.editor.renderer.canvas.add(this.preview);
-
-    }
-
-    onMouseMove(pointer) {
-
-        if (!this.isDrawing) return;
-
-        const width = pointer.x - this.startX;
-        const height = pointer.y - this.startY;
-
-        this.preview.set({
-
-            width: Math.abs(width),
-
-            height: Math.abs(height),
-
-            left: width >= 0 ? this.startX : pointer.x,
-
-            top: height >= 0 ? this.startY : pointer.y
-
-        });
-
-        this.editor.renderer.canvas.requestRenderAll();
-
-    }
-
-    onMouseUp(pointer) {
-
-        if (!this.isDrawing) return;
-
-        this.isDrawing = false;
-
-        this.editor.renderer.canvas.remove(this.preview);
-
-        const width = this.preview.width;
-        const height = this.preview.height;
-
-        if (width < 2 || height < 2) {
-
-            this.preview = null;
-
-            return;
-
-        }
-
-        const node = new RectangleNode({
-
-            x: this.preview.left,
-
-            y: this.preview.top,
-
-            width,
-
-            height,
+            height: 0,
 
             fill: this.editor.colors.fill,
 
@@ -133,13 +62,94 @@ export default class RectangleTool extends Tool {
 
             strokeWidth: this.editor.colors.strokeWidth
 
+        };
+
+        this.editor.renderer.render();
+
+    }
+
+    onMouseMove(pointer, event) {
+
+        if (!this.isDrawing) return;
+
+        let width = pointer.x - this.startX;
+        let height = pointer.y - this.startY;
+
+        if (event.shiftKey) {
+            
+            const size = Math.max(width, height);
+
+            width = size;
+            height = size;
+
+        }
+
+        this.preview.width = width;
+        this.preview.height = height;
+
+        this.editor.renderer.render();
+
+    }
+
+    onMouseUp() {
+
+        if (!this.isDrawing) return;
+
+        this.isDrawing = false;
+
+        if (
+            Math.abs(this.preview.width) < 2 ||
+            Math.abs(this.preview.height) < 2
+        ) {
+
+            this.preview = null;
+
+            this.editor.renderer.render();
+
+            return;
+
+        }
+
+        let x = this.preview.x;
+        let y = this.preview.y;
+
+        let width = this.preview.width;
+        let height = this.preview.height;
+
+        if (width < 0) {
+
+            x += width;
+            width = Math.abs(width);
+
+        }
+
+        if (height < 0) {
+
+            y += height;
+            height = Math.abs(height);
+
+        }
+
+        const node = new RectangleNode({
+
+            x,
+            y,
+            width,
+            height,
+
+            fill: this.preview.fill,
+            stroke: this.preview.stroke,
+            strokeWidth: this.preview.strokeWidth
+
         });
 
         this.editor.document.addNode(node);
 
-        this.editor.renderer.render();
+        console.log(this.editor.document.getMart());
 
         this.preview = null;
+
+        this.editor.renderer.render();
 
     }
 

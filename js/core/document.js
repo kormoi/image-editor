@@ -1,6 +1,7 @@
 import Node from "../nodes/Node.js";
 import ArtboardNode from "../nodes/ArtboardNode.js";
 import LayerNode from "../nodes/LayerNode.js";
+import defaultMart from "../defaults/defaultMart.js";
 
 export default class Document {
 
@@ -20,43 +21,87 @@ export default class Document {
 
     }
 
-    initialize() {
+    initialize(options = {}) {
 
-        // Root Scene Node
+        // Load .mart or create default
+        this.mart = options.mart
+            ? structuredClone(options.mart)
+            : structuredClone(defaultMart);
+
+        // Override size for new document
+        if (!options.mart && options.width && options.height) {
+
+            this.mart.settings.width = options.width;
+            this.mart.settings.height = options.height;
+
+            this.mart.artboards[0].width = options.width;
+            this.mart.artboards[0].height = options.height;
+
+        }
+
+        // Build the runtime scene graph
         this.root = new Node("root");
         this.root.name = "Document";
 
-        // Default Artboard
-        const artboard = new ArtboardNode({
+        this.activeArtboard = null;
+        this.activeLayer = null;
 
-            name: "Artboard 1",
+        for (const artboardData of this.mart.artboards) {
 
-            width: 1920,
+            console.log("Artboard data:", artboardData);
+            console.log("Layers:", artboardData.layers);
 
-            height: 1080,
+            const artboard = new ArtboardNode(artboardData);
 
-            background: "#ffffff"
+            if (artboardData.layers) {
 
-        });
+                for (const layerData of artboardData.layers) {
 
-        // Default Layer
-        const layer = new LayerNode({
+                    console.log("Creating layer:", layerData);
 
-            name: "Layer 1"
+                    const layer = new LayerNode(layerData);
 
-        });
+                    console.log("Layer created:", layer);
 
-        artboard.add(layer);
+                    artboard.add(layer);
 
-        this.root.add(artboard);
+                    if (!this.activeLayer) {
 
-        this.activeArtboard = artboard;
+                        this.activeLayer = layer;
+                        console.log("Active layer assigned:", this.activeLayer);
 
-        this.activeLayer = layer;
+                    }
+
+                }
+
+            }
+
+            this.root.add(artboard);
+
+            if (!this.activeArtboard) {
+
+                this.activeArtboard = artboard;
+
+            }
+
+        }
+
+        console.log("Final activeLayer:", this.activeLayer);
 
         this.editor.eventBus?.emit("document:created", this);
 
         console.log("✔ Document");
+    }
+
+    getMart() {
+
+        return this.mart;
+        
+    }
+
+    getArtboards() {
+
+        return this.mart.artboards;
 
     }
 

@@ -3,12 +3,14 @@ import Document from "./document.js";
 import ToolManager from "../tools/ToolManager.js";
 import SelectionTool from "../tools/SelectionTool.js";
 import RectangleTool from "../tools/RectangleTool.js";
+import EllipseTool from "../tools/EllipseTool.js";
 import EventBus from "./eventBus.js";
 import History from "./History.js";
 import Viewport from "./Viewport.js";
 import Selection from "./Selection.js";
 import Transform from "./Transform.js";
-
+import ToolbarManager from "../ui/ToolbarManager.js";
+import ThemeManager from "./ThemeManager.js";
 
 
 
@@ -23,7 +25,6 @@ export default class Editor {
         this.initialized = false;
 
         // Core Modules
-
         this.renderer = null;
         this.eventBus = null;
         this.document = null;
@@ -35,6 +36,8 @@ export default class Editor {
         this.tools = null;
         this.clipboard = null;
         this.project = null;
+        this.toolbarManager = null;
+        this.themeManager = null;
         this.panels = null;
         this.ui = null;
         this.viewport = null;
@@ -54,7 +57,7 @@ export default class Editor {
 
     }
 
-    async initialize() {
+    async initialize(options = {}) {
 
         console.group("Editor Initialization");
 
@@ -62,19 +65,28 @@ export default class Editor {
 
         this.updateStatus("Loading...");
 
-        // These modules will be added one by one
+        // Core
         await this.initializeEventBus();
-        await this.initializeDocument();
+        await this.initializeDocument(options);
         await this.initializeSelection();
         await this.initializeHistory();
         await this.initializeTransform();
         await this.initializeRenderer();
         await this.initializeViewport();
+
+        // Optional
         // await this.initializeLibrary();
         // await this.initializePanels();
+
         await this.initializeTools();
+        await this.initializeToolbarManager();
+        await this.initializeThemeManager();
+
         this.bindToolbar();
         this.bindEvents();
+
+        // Everything now exists
+        this.renderer.render();
 
         this.initialized = true;
 
@@ -83,6 +95,26 @@ export default class Editor {
         console.log("✔ Editor initialized");
 
         console.groupEnd();
+
+    }
+
+    async initializeToolbarManager() {
+
+        this.toolbarManager = new ToolbarManager(this);
+
+        this.toolbarManager.initialize();
+
+        console.log("✔ Toolbar Manager");
+
+    }
+
+    async initializeThemeManager() {
+
+        this.themeManager = new ThemeManager(this);
+
+        this.themeManager.initialize();
+
+        console.log("✔ Theme Manager");
 
     }
 
@@ -106,10 +138,10 @@ export default class Editor {
 
         this.tools = new ToolManager(this);
 
-        this.tools.register(
-            new SelectionTool(this)
-        );
+        this.tools.register(new SelectionTool(this));
         this.tools.register(new RectangleTool(this));
+        this.tools.register(new EllipseTool(this));
+
         this.tools.activate("select");
 
         this.updateStatus("Tools Ready");
@@ -117,11 +149,11 @@ export default class Editor {
         console.log("✔ Tool Manager");
 
     }
-    async initializeDocument() {
+    async initializeDocument(options = {}) {
 
         this.document = new Document(this);
 
-        this.document.initialize();
+        await this.document.initialize(options);
 
         this.updateStatus("Document Ready");
 
@@ -215,15 +247,33 @@ export default class Editor {
 
         });
 
+        //
+        // Key Down
+        //
+
         window.addEventListener("keydown", (e) => {
 
             const ctrl = e.ctrlKey || e.metaKey;
+
+            //
+            // Temporary Selection Tool
+            //
+
+            if (e.key === "Control" && !e.repeat) {
+
+                this.tools.activateTemporary("select");
+
+            }
 
             if (!ctrl) {
 
                 return;
 
             }
+
+            //
+            // Undo / Redo
+            //
 
             if (e.key.toLowerCase() === "z") {
 
@@ -244,6 +294,20 @@ export default class Editor {
                 e.preventDefault();
 
                 this.history.redo();
+
+            }
+
+        });
+
+        //
+        // Key Up
+        //
+
+        window.addEventListener("keyup", (e) => {
+
+            if (e.key === "Control") {
+
+                this.tools.restoreTemporary();
 
             }
 

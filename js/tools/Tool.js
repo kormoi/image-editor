@@ -18,8 +18,6 @@ export default class Tool {
 
         this.setCursor(this.cursor);
 
-        console.log(`${this.name} activated`);
-
     }
 
     deactivate() {

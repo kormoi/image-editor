@@ -8,6 +8,8 @@ export default class ToolManager {
 
         this.activeTool = null;
 
+        this.previousTool = null;
+
     }
 
     register(tool) {
@@ -15,44 +17,6 @@ export default class ToolManager {
         this.tools.set(tool.name, tool);
 
     }
-
-    activate(name) {
-
-        if (this.activeTool) {
-
-            this.activeTool.deactivate();
-
-        }
-
-        const tool = this.tools.get(name);
-
-        if (!tool) {
-
-            console.warn(`Tool '${name}' not found.`);
-
-            return;
-
-        }
-
-        this.activeTool = tool;
-
-        this.activeTool.activate();
-
-        this.editor.eventBus.emit("tool:changed", {
-
-            tool: name
-
-        });
-
-    }
-
-    getActive() {
-
-        return this.activeTool;
-
-    }
-
-
 
     activate(name) {
 
@@ -75,7 +39,7 @@ export default class ToolManager {
         this.activeTool = tool;
 
         this.activeTool.activate();
-        
+
         document
             .querySelectorAll("#toolbar button")
             .forEach(button => {
@@ -86,11 +50,46 @@ export default class ToolManager {
                 );
 
             });
-        console.log("Activated:", this.activeTool.name);
+        console.log("Activated Tool:", this.activeTool.name);
 
         this.editor.eventBus.emit("tool:changed", {
             tool: name
         });
 
     }
+
+    getActive() {
+
+        return this.activeTool;
+
+    }
+
+    activateTemporary(name) {
+
+        if (this.activeTool.name === name) {
+
+            return;
+
+        }
+
+        this.previousTool = this.activeTool;
+
+        this.activate(name);
+
+    }
+
+    restoreTemporary() {
+
+        if (!this.previousTool) {
+
+            return;
+
+        }
+
+        this.activate(this.previousTool.name);
+
+        this.previousTool = null;
+
+    }
+
 }

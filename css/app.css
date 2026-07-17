@@ -1,405 +1,121 @@
-/* ==========================================================
-   THEME
-========================================================== */
+/* ========================================================= */
+/* Reset */
+/* ========================================================= */
 
-:root{
+*,
+*::before,
+*::after{
 
-    --bg:#1b1d21;
+    box-sizing:border-box;
 
-    --bg2:#22252b;
+    margin:0;
 
-    --bg3:#2b2f36;
-
-    --bg4:#333842;
-
-    --panel:#252932;
-
-    --panel-hover:#303540;
-
-    --border:#3d434f;
-
-    --text:#e8e8e8;
-
-    --text-muted:#9ea4ad;
-
-    --accent:#4f9cff;
-
-    --accent-hover:#69adff;
-
-    --success:#2ecc71;
-
-    --warning:#f1c40f;
-
-    --danger:#e74c3c;
-
-    --radius:8px;
-
-    --shadow:0 6px 18px rgba(0,0,0,.35);
+    padding:0;
 
 }
 
 
+/* ========================================================= */
+/* Root */
+/* ========================================================= */
 
-/* ==========================================================
-   BODY
-========================================================== */
-
+html,
 body{
 
-    background:var(--bg);
+    width:100%;
 
-    color:var(--text);
-
-    user-select:none;
-
-}
-
-
-
-/* ==========================================================
-   HEADER
-========================================================== */
-
-#app-header{
-
-    background:var(--bg2);
-
-    border-bottom:1px solid var(--border);
-
-}
-
-
-
-#logo{
-
-    font-size:18px;
-
-    font-weight:700;
-
-}
-
-
-
-.header-left{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:16px;
-
-}
-
-
-
-.header-right{
-
-    display:flex;
-
-    gap:8px;
-
-}
-
-
-
-/* ==========================================================
-   PROJECT NAME
-========================================================== */
-
-#project-name{
-
-    width:220px;
-
-    background:var(--bg3);
-
-    border:1px solid var(--border);
-
-    color:var(--text);
-
-    padding:8px 10px;
-
-    border-radius:6px;
-
-    outline:none;
-
-}
-
-
-
-#project-name:focus{
-
-    border-color:var(--accent);
-
-}
-
-
-
-/* ==========================================================
-   BUTTONS
-========================================================== */
-
-button{
-
-    background:var(--bg3);
-
-    border:1px solid var(--border);
-
-    color:var(--text);
-
-    border-radius:6px;
-
-    cursor:pointer;
-
-    transition:.15s;
-
-}
-
-
-
-button:hover{
-
-    background:var(--panel-hover);
-
-}
-
-
-
-button:active{
-
-    transform:scale(.98);
-
-}
-
-
-
-button:disabled{
-
-    opacity:.45;
-
-    cursor:not-allowed;
-
-}
-
-
-
-/* ==========================================================
-   TOOLBAR
-========================================================== */
-
-#toolbar{
-
-    background:var(--bg2);
-
-    border-bottom:1px solid var(--border);
-
-}
-
-
-
-#toolbar button{
-
-    height:34px;
-
-    padding:0 12px;
-
-}
-
-
-
-/* ==========================================================
-   DOCKS
-========================================================== */
-
-.dock{
-
-    background:var(--panel);
-
-    border-right:1px solid var(--border);
-
-}
-
-
-
-#right-dock{
-
-    border-right:none;
-
-    border-left:1px solid var(--border);
-
-}
-
-
-
-/* ==========================================================
-   DOCK HEADER
-========================================================== */
-
-.dock-header{
-
-    background:var(--bg3);
-
-    border-bottom:1px solid var(--border);
-
-    font-weight:600;
-
-}
-
-
-
-/* ==========================================================
-   SPLITTER
-========================================================== */
-
-.splitter{
-
-    background:var(--border);
-
-    transition:.15s;
-
-}
-
-
-
-.splitter:hover{
-
-    background:var(--accent);
-
-}
-
-
-
-/* ==========================================================
-   CANVAS
-========================================================== */
-
-#canvas-area{
-
-    background:#2d3139;
-
-}
-
-
-
-#canvas-container{
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-}
-
-
-
-/* ==========================================================
-   STATUS BAR
-========================================================== */
-
-#statusbar{
-
-    background:var(--bg2);
-
-    border-top:1px solid var(--border);
-
-    color:var(--text-muted);
-
-    font-size:13px;
-
-}
-
-
-
-/* ==========================================================
-   COMMAND PALETTE
-========================================================== */
-
-#command-palette{
-
-    background:var(--panel);
-
-    border:1px solid var(--border);
-
-    border-radius:12px;
-
-    box-shadow:var(--shadow);
+    height:100%;
 
     overflow:hidden;
 
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+
+    background:#1f1f1f;
+
+    color:#f2f2f2;
+
 }
 
 
+/* ========================================================= */
+/* Application */
+/* ========================================================= */
 
-#command-input{
+#editor{
 
-    background:var(--bg3);
+    width:100vw;
+
+    height:100vh;
+
+}
+
+
+/* ========================================================= */
+/* Buttons */
+/* ========================================================= */
+
+button{
+
+    font:inherit;
+
+    cursor:pointer;
 
     border:none;
 
-    color:var(--text);
+    outline:none;
+
+    background:none;
+
+}
+
+
+/* ========================================================= */
+/* Inputs */
+/* ========================================================= */
+
+input,
+textarea,
+select{
+
+    font:inherit;
 
     outline:none;
 
 }
 
 
+/* ========================================================= */
+/* Links */
+/* ========================================================= */
 
-#command-results{
+a{
 
-    background:var(--panel);
+    color:inherit;
 
-}
-
-
-
-/* ==========================================================
-   SCROLLBAR
-========================================================== */
-
-::-webkit-scrollbar{
-
-    width:10px;
-
-    height:10px;
+    text-decoration:none;
 
 }
 
 
+/* ========================================================= */
+/* Images */
+/* ========================================================= */
 
-::-webkit-scrollbar-track{
+img{
 
-    background:var(--bg2);
+    user-select:none;
 
-}
-
-
-
-::-webkit-scrollbar-thumb{
-
-    background:var(--bg4);
-
-    border-radius:20px;
+    -webkit-user-drag:none;
 
 }
 
 
+/* ========================================================= */
+/* Hidden */
+/* ========================================================= */
 
-::-webkit-scrollbar-thumb:hover{
+.hidden{
 
-    background:var(--accent);
-
-}
-
-
-
-/* ==========================================================
-   SELECTION
-========================================================== */
-
-::selection{
-
-    background:var(--accent);
-
-    color:white;
+    display:none !important;
 
 }

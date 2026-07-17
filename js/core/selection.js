@@ -10,6 +10,50 @@ export default class Selection {
 
     }
 
+    add(node) {
+
+        if (this.nodes.includes(node)) {
+
+            return;
+
+        }
+
+        node.selected = true;
+
+        this.nodes.push(node);
+
+    }
+
+    remove(node) {
+
+        const index = this.nodes.indexOf(node);
+
+        if (index === -1) {
+
+            return;
+
+        }
+
+        node.selected = false;
+
+        this.nodes.splice(index, 1);
+
+    }
+
+    toggle(node) {
+
+        if (this.nodes.includes(node)) {
+
+            this.remove(node);
+
+        } else {
+
+            this.add(node);
+
+        }
+
+    }
+
     set(nodes) {
 
         this.clear();
@@ -27,6 +71,42 @@ export default class Selection {
     select(node) {
 
         this.set([node]);
+
+    }
+
+    getBounds() {
+
+        if (!this.nodes.length) {
+
+            return null;
+
+        }
+
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+
+        this.nodes.forEach(node => {
+
+            const t = node.transform;
+
+            left = Math.min(left, t.x);
+            top = Math.min(top, t.y);
+
+            right = Math.max(right, t.x + t.width);
+            bottom = Math.max(bottom, t.y + t.height);
+
+        });
+
+        return {
+
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top
+
+        };
 
     }
 
@@ -101,6 +181,12 @@ export default class Selection {
     getPrimary() {
 
         return this.nodes[0] ?? null;
+
+    }
+
+    getSelected() {
+
+        return this.nodes;
 
     }
 

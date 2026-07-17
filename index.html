@@ -5,10 +5,9 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Editor V2</title>
+    <title>MART Editor</title>
 
     <!-- CSS -->
 
@@ -20,214 +19,241 @@
     <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="css/command.css">
 
-    <!-- Fabric.js -->
-
-    <script src="https://cdn.jsdelivr.net/npm/fabric@6.7.1/dist/index.min.js"></script>
-
 </head>
 
 <body>
 
-<div id="editor">
+    <div id="editor">
 
-    <!-- ========================================================= -->
-    <!-- Header -->
-    <!-- ========================================================= -->
+        <!-- ====================================================== -->
+        <!-- Header -->
+        <!-- ====================================================== -->
 
-    <header id="app-header">
+        <header id="app-header">
 
-        <div class="header-left">
+            <div class="header-left">
+                <button id="sidebar-toggle">☰</button>
+                <div id="logo">
 
-            <div id="logo">
-                Editor V2
+                    MART
+
+                </div>
+
+                <input id="project-name" type="text" value="Untitled Project">
+                <p class="save-status">🖫 Saving...</p>
             </div>
+            <div class="middle-menu">
+                <button class="menu-item">File</button>
 
-            <input
-                    id="project-name"
-                    type="text"
-                    value="Untitled Project">
+                <button class="menu-item">Edit</button>
 
-        </div>
+                <button class="menu-item">View</button>
 
-        <div class="header-right">
+                <button class="menu-item">Effect</button>
 
-            <button id="btnUndo">Undo</button>
+                <button class="menu-item">Help</button>
+            </div>
+            <div class="header-right">
 
-            <button id="btnRedo">Redo</button>
+                <button id="btnUndo">Undo</button>
 
-            <button id="btnSave">Save</button>
+                <button id="btnRedo">Redo</button>
 
-            <button id="btnExport">Export</button>
+                <button id="btnSave">Save</button>
 
-        </div>
-
-    </header>
-
-    <!-- ========================================================= -->
-    <!-- Toolbar -->
-    <!-- ========================================================= -->
-
-    <nav id="toolbar">
-
-        <button data-tool="select">Select</button>
-
-        <button data-tool="node">Node</button>
-
-        <button data-tool="pen">Pen</button>
-
-        <button data-tool="rectangle">Rectangle</button>
-
-        <button data-tool="ellipse">Ellipse</button>
-
-        <button data-tool="text">Text</button>
-
-        <button data-tool="image">Image</button>
-
-        <button data-tool="crop">Crop</button>
-
-        <button data-tool="brush">Brush</button>
-
-        <button data-tool="eraser">Eraser</button>
-
-    </nav>
-
-    <!-- ========================================================= -->
-    <!-- Workspace -->
-    <!-- ========================================================= -->
-
-    <main id="workspace">
-
-        <!-- LEFT DOCK -->
-
-        <aside
-                id="left-dock"
-                class="dock">
-
-            <div class="dock-header">
-
-                <span>Library</span>
-
-                <button class="collapse-button">
-                    ◀
-                </button>
+                <button id="btnExport">Export</button>
 
             </div>
 
-            <div id="left-panel-container">
+        </header>
 
-                <!-- Panels injected here -->
+
+
+        <!-- ====================================================== -->
+        <!-- Main -->
+        <!-- ====================================================== -->
+
+        <main id="main-layout">
+
+            <!-- =============================================== -->
+            <!-- Sidebar -->
+            <!-- =============================================== -->
+
+            <aside id="sidebar">
+
+                <div id="panel-container">
+
+                    <!--
+                    Properties
+                    Layers
+                    Assets
+                    History
+                    Colors
+                    Effects
+                    Typography
+                    Alignment
+                    Export
+                    Plugins
+                -->
+
+                </div>
+
+            </aside>
+
+
+
+            <!-- =============================================== -->
+            <!-- Sidebar Splitter -->
+            <!-- =============================================== -->
+
+            <div id="sidebar-splitter"></div>
+
+
+
+            <!-- =============================================== -->
+            <!-- Workspace -->
+            <!-- =============================================== -->
+
+            <section id="workspace">
+
+                <!-- Workspace Overlay -->
+
+                <nav id="toolbar">
+                    <div id="toolbar-handle">
+                        ⋮⋮⋮⋮⋮⋮⋮⋮
+                    </div>
+                    <button data-tool="select" title="Select">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-select"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="node" title="Node">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-node"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="pen" title="Pen">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-pen"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="rectangle" title="Rectangle">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-rectangle"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="ellipse" title="Ellipse">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-ellipse"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="text" title="Text">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-text"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="image" title="Image">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-image"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="crop" title="Crop">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-crop"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="brush" title="Brush">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-brush"></use>
+                        </svg>
+                    </button>
+
+                    <button data-tool="eraser" title="Eraser">
+                        <svg class="tool-icon">
+                            <use href="assets/icons.svg#icon-eraser"></use>
+                        </svg>
+                    </button>
+
+
+                </nav>
+
+
+
+                <!-- Workspace View -->
+
+                <div id="workspace-view">
+
+                    <div id="canvas-container">
+
+                        <canvas id="editor-canvas"></canvas>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+
+        <!-- ====================================================== -->
+        <!-- Status Bar -->
+        <!-- ====================================================== -->
+
+        <footer id="statusbar">
+
+            <div id="status-left">
+
+                Ready
 
             </div>
 
-        </aside>
+            <div id="status-right">
 
-        <!-- LEFT SPLITTER -->
+                <span id="tool-name">
 
-        <div
-                id="left-splitter"
-                class="splitter">
-        </div>
+                    Select
 
-        <!-- CANVAS -->
+                </span>
 
-        <section id="canvas-area">
+                |
 
-            <div id="canvas-container">
+                <span id="zoom-level">
 
-                <canvas id="editor-canvas"></canvas>
+                    100%
 
-            </div>
-
-        </section>
-
-        <!-- RIGHT SPLITTER -->
-
-        <div
-                id="right-splitter"
-                class="splitter">
-        </div>
-
-        <!-- RIGHT DOCK -->
-
-        <aside
-                id="right-dock"
-                class="dock">
-
-            <div class="dock-header">
-
-                <span>Properties</span>
-
-                <button class="collapse-button">
-                    ▶
-                </button>
+                </span>
 
             </div>
 
-            <div id="right-panel-container">
-
-                <!-- Panels injected here -->
-
-            </div>
-
-        </aside>
-
-    </main>
-
-    <!-- ========================================================= -->
-    <!-- Status Bar -->
-    <!-- ========================================================= -->
-
-    <footer id="statusbar">
-
-        <div id="status-left">
-
-            Ready
-
-        </div>
-
-        <div id="status-right">
-
-            <span id="tool-name">
-
-                Select
-
-            </span>
-
-            |
-
-            <span id="zoom-level">
-
-                100%
-
-            </span>
-
-        </div>
-
-    </footer>
-
-</div>
-
-<!-- ========================================================= -->
-<!-- Command Palette -->
-<!-- ========================================================= -->
-
-<div id="command-palette"
-     class="hidden">
-
-    <input
-            id="command-input"
-            type="text"
-            placeholder="Type a command...">
-
-    <div id="command-results">
+        </footer>
 
     </div>
 
-</div>
 
-<script type="module"
-        src="js/app.js">
-</script>
+
+    <!-- ====================================================== -->
+    <!-- Command Palette -->
+    <!-- ====================================================== -->
+
+    <div id="command-palette" class="hidden">
+
+        <input id="command-input" type="text" placeholder="Type a command...">
+
+        <div id="command-results"></div>
+
+    </div>
+
+    <script type="module" src="js/app.js"></script>
 
 </body>
 

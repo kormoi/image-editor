@@ -49,48 +49,29 @@ export default class Viewport {
 
         const canvas = this.editor.renderer.canvas;
 
-        canvas.on("mouse:wheel", (event) => {
-
-            const e = event.e;
-
-            let zoom = canvas.getZoom();
-
-            zoom *= Math.pow(0.999, e.deltaY);
-
-            zoom = Math.max(this.minZoom, Math.min(this.maxZoom, zoom));
-
-            canvas.zoomToPoint(
-
-                new fabric.Point(e.offsetX, e.offsetY),
-
-                zoom
-
-            );
-
-            this.zoom = zoom;
+        canvas.addEventListener("wheel", (e) => {
 
             e.preventDefault();
 
-            e.stopPropagation();
+            const factor = e.deltaY < 0 ? 1.1 : 0.9;
 
-        });
+            this.zoom *= factor;
+
+            this.zoom = Math.max(
+                this.minZoom,
+                Math.min(this.maxZoom, this.zoom)
+            );
+
+            this.editor.renderer.render();
+
+        }, { passive: false });
 
     }
 
 
     applyBackground() {
 
-        console.log("Editor:", this.editor);
-
-        console.log("Renderer:", this.editor.renderer);
-
-        console.log("Canvas:", this.editor.renderer?.canvas);
-
-        this.editor.renderer.setBackground(
-
-            this.workspace.background
-
-        );
+        // Nothing here for now.
 
     }
 

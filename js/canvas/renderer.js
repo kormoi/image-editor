@@ -1,5 +1,3 @@
-
-
 export default class Renderer {
 
     constructor(editor) {
@@ -8,7 +6,7 @@ export default class Renderer {
 
         this.canvas = null;
 
-        this.artboard = null;
+        this.ctx = null;
 
         this.width = 0;
 
@@ -18,277 +16,204 @@ export default class Renderer {
 
     initialize() {
 
-        const canvasElement = this.editor.elements.canvas;
+        this.canvas = this.editor.elements.canvas;
 
-        this.canvas = new fabric.Canvas(canvasElement, {
-
-            selection: true,
-            preserveObjectStacking: true,
-            stopContextMenu: true,
-            fireRightClick: true,
-            renderOnAddRemove: true
-
-        });
+        this.ctx = this.canvas.getContext("2d");
 
         this.resize();
 
-        this.createArtboard();
-
         this.bindEvents();
+
+        window.addEventListener(
+            "resize",
+            () => {
+
+                this.resize();
+
+                this.render();
+
+            }
+        );
 
         console.log("✔ Renderer");
 
     }
 
-    setBackground(color) {
-
-        if (!this.canvas) return;
-
-        this.canvas.backgroundColor = color;
-
-        this.canvas.requestRenderAll();
-
-    }
-
     bindEvents() {
 
-        window.addEventListener("resize", () => {
+        this.canvas.addEventListener(
+            "mousedown",
+            this.onMouseDown.bind(this)
+        );
 
-            this.resize();
+        this.canvas.addEventListener(
+            "mousemove",
+            this.onMouseMove.bind(this)
+        );
 
-
-        });
-
-        const canvas = this.canvas;
-
-        let transforming = false;
-
-
-        canvas.on("mouse:down", () => {
-
-            const active = canvas.getActiveObjects();
-
-            if (!active.length) {
-
-                return;
-
-            }
-
-            transforming = true;
-
-            this.editor.transform.begin(active);
-
-        });
-
-        canvas.on("object:moving", () => {
-
-            if (!transforming) {
-
-                return;
-
-            }
-
-            this.editor.transform.update(
-
-                canvas.getActiveObjects()
-
-            );
-
-        });
-
-        canvas.on("object:scaling", () => {
-
-            if (!transforming) {
-
-                return;
-
-            }
-
-            this.editor.transform.update(
-
-                canvas.getActiveObjects()
-
-            );
-
-        });
-
-        canvas.on("object:rotating", () => {
-
-            if (!transforming) {
-
-                return;
-
-            }
-
-            this.editor.transform.update(
-
-                canvas.getActiveObjects()
-
-            );
-
-        });
-
-        canvas.on("mouse:move", (e) => {
-
-            const tool = this.editor.tools.getActive();
-
-            if (tool && tool.name !== "select" && tool.onMouseMove) {
-
-                tool.onMouseMove(e.pointer);
-
-            }
-
-        });
-
-        canvas.on("mouse:up", () => {
-
-            if (!transforming) {
-
-                return;
-
-            }
-
-            transforming = false;
-
-            const step = this.editor.transform.finish(
-
-                canvas.getActiveObjects()
-
-            );
-
-            this.editor.history.addStep(step);
-
-        });
-
-        canvas.on("mouse:dblclick", (e) => {
-
-            const tool = this.editor.tools.getActive();
-
-            if (tool && tool.onDoubleClick) {
-
-                tool.onDoubleClick(e);
-
-            }
-
-        });
-
+        window.addEventListener(
+            "mouseup",
+            this.onMouseUp.bind(this)
+        );
 
     }
 
-    createArtboard() {
+    hitTest(pointer) {
 
-        const artboard = this.editor.document.getActiveArtboard();
+        const nodes = [];
 
-        if (!artboard) return;
+        this.editor.document.traverse(node => {
 
-        if (artboard.background.type === "transparent") {
+            nodes.push(node);
 
-            this.drawCheckerboard();
+        });
+
+        // Top-most first
+        nodes.reverse();
+
+        for (const node of nodes) {
+
+            if (node.type !== "rectangle") continue;
+
+            const t = node.transform;
+
+            if (
+                pointer.x >= t.x &&
+                pointer.x <= t.x + t.width &&
+                pointer.y >= t.y &&
+                pointer.y <= t.y + t.height
+            ) {
+
+                return node;
+
+            }
 
         }
 
-        this.artboard = new fabric.Rect({
-
-            left: 0,
-
-            top: 0,
-
-            width: artboard.width,
-
-            height: artboard.height,
-
-            fill: this.getArtboardFill(artboard),
-
-            stroke: "#d0d0d0",
-
-            strokeWidth: 1,
-
-            shadow: new fabric.Shadow({
-
-                color: "rgba(0,0,0,0.15)",
-
-                blur: 20,
-
-                offsetX: 0,
-
-                offsetY: 4
-
-            }),
-
-            selectable: false,
-
-            evented: false,
-
-            excludeFromExport: true,
-
-            lockMovementX: true,
-
-            lockMovementY: true,
-
-            lockRotation: true,
-
-            lockScalingX: true,
-
-            lockScalingY: true,
-
-            lockSkewingX: true,
-
-            lockSkewingY: true
-
-        });
-
-        this.artboard.node = artboard;
-
-        this.canvas.add(this.artboard);
-
-        this.centerArtboard();
+        return null;
 
     }
 
-    drawCheckerboard() {
+    drawSelection() {
 
-        // TODO
+        const selected = this.editor.selection.getSelected();
 
-    }
+        if (!selected || !selected.length) {
 
-    getArtboardFill(artboard) {
-
-        switch (artboard.background.type) {
-
-            case "transparent":
-
-                return "transparent";
-
-            case "solid":
-
-                return artboard.background.color;
-
-            case "gradient":
-
-                return this.createGradient(artboard);
+            return;
 
         }
 
-    }
+        selected.forEach(node => {
 
-    createGradient(artboard) {
-
-        // We'll implement this later.
-
-        return "#ffffff";
-
-    }
-    centerArtboard() {
-
-        if (!this.artboard) return;
-
-        this.artboard.set({
-
-            left: (this.width - this.artboard.width) / 2,
-
-            top: (this.height - this.artboard.height) / 2
+            this.drawSelectionBox(node);
 
         });
+
+    }
+
+    drawSelectionBox(node) {
+
+        const ctx = this.ctx;
+
+        const t = node.transform;
+
+        ctx.save();
+
+        ctx.strokeStyle = "#000000";
+
+        ctx.lineWidth = 1;
+
+        ctx.setLineDash([]);
+
+        ctx.strokeRect(
+            t.x,
+            t.y,
+            t.width,
+            t.height
+        );
+
+        ctx.restore();
+
+    }
+
+    drawMarquee() {
+
+        const tool = this.editor.tools.getActive();
+
+        if (!tool?.marquee?.active) {
+
+            return;
+
+        }
+
+        const x = Math.min(tool.marquee.start.x, tool.marquee.current.x);
+
+        const y = Math.min(tool.marquee.start.y, tool.marquee.current.y);
+
+        const w = Math.abs(tool.marquee.current.x - tool.marquee.start.x);
+
+        const h = Math.abs(tool.marquee.current.y - tool.marquee.start.y);
+
+        this.ctx.save();
+
+        this.ctx.fillStyle = "rgba(74,141,255,.12)";
+
+        this.ctx.strokeStyle = "#4A8DFF";
+
+        this.ctx.lineWidth = 1;
+
+        this.ctx.setLineDash([3, 3]);
+
+        this.ctx.fillRect(x, y, w, h);
+
+        this.ctx.strokeRect(x, y, w, h);
+
+        this.ctx.restore();
+
+    }
+
+    onMouseDown(e) {
+
+        const tool = this.editor.tools.getActive();
+
+        if (!tool) return;
+
+        tool.onMouseDown(this.getPointer(e), e);
+
+    }
+
+    onMouseMove(e) {
+
+        const tool = this.editor.tools.getActive();
+
+        if (!tool) return;
+
+        tool.onMouseMove(this.getPointer(e), e);
+
+    }
+
+    onMouseUp(e) {
+
+        const tool = this.editor.tools.getActive();
+
+        if (!tool) return;
+
+        tool.onMouseUp(this.getPointer(e), e);
+
+    }
+
+    getPointer(e) {
+
+        const rect = this.canvas.getBoundingClientRect();
+
+        return {
+
+            x: e.clientX - rect.left,
+
+            y: e.clientY - rect.top
+
+        };
 
     }
 
@@ -297,193 +222,357 @@ export default class Renderer {
         const container = this.editor.elements.canvasContainer;
 
         this.width = container.clientWidth;
-
         this.height = container.clientHeight;
 
-        this.canvas.setDimensions({
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
 
-            width: this.width,
+        if (this.editor.initialized) {
 
-            height: this.height
-
-        });
-
-        if (this.artboard) {
-
-            this.centerArtboard();
+            this.render();
 
         }
 
-        this.canvas.requestRenderAll();
-
     }
 
-    findFabricObject(node) {
+    clear() {
 
-        return this.canvas
-            .getObjects()
-            .find(object => object.node === node);
+        this.ctx.clearRect(
 
-    }
+            0,
+            0,
+            this.width,
+            this.height
 
-    renderDocument() {
-
-        // 1. Remember selected nodes
-        const selectedNodes = this.canvas
-            .getActiveObjects()
-            .map(object => object.node);
-
-        // 2. Remove old Fabric objects
-        const objects = this.canvas.getObjects().slice();
-
-        objects.forEach(object => {
-
-            if (object !== this.artboard) {
-
-                this.canvas.remove(object);
-
-            }
-
-        });
-
-        // 3. Draw new Fabric objects
-        this.editor.document.traverse(node => {
-
-            switch (node.type) {
-
-                case "rectangle":
-                    this.drawRectangle(node);
-                    break;
-
-                case "ellipse":
-                    this.drawEllipse(node);
-                    break;
-
-                case "text":
-                    this.drawText(node);
-                    break;
-
-            }
-
-        });
-
-        // 4. Find the NEW Fabric objects
-        const selectedObjects = selectedNodes
-            .map(node => this.findFabricObject(node))
-            .filter(Boolean);
-
-        // 5. Restore selection
-        if (selectedObjects.length === 1) {
-
-            this.canvas.setActiveObject(selectedObjects[0]);
-
-        } else if (selectedObjects.length > 1) {
-
-            const selection = new fabric.ActiveSelection(selectedObjects, {
-
-                canvas: this.canvas
-
-            });
-
-            this.canvas.setActiveObject(selection);
-
-        }
-
-        // 6. Render
-        this.canvas.requestRenderAll();
-
-    }
-
-    drawRectangle(node) {
-
-        const rect = new fabric.Rect({
-
-            left: node.transform.x,
-
-            top: node.transform.y,
-
-            width: node.transform.width,
-
-            height: node.transform.height,
-
-            fill: node.style.fill,
-
-            stroke: node.style.stroke,
-
-            strokeWidth: node.style.strokeWidth
-
-        });
-
-        rect.node = node;
-
-        this.canvas.add(rect);
-
-    }
-
-    drawEllipse(node) {
-
-        const ellipse = new fabric.Ellipse({
-
-            left: node.transform.x,
-
-            top: node.transform.y,
-
-            rx: node.rx,
-
-            ry: node.ry,
-
-            fill: node.fill,
-
-            stroke: node.stroke,
-
-            strokeWidth: node.strokeWidth,
-
-            originX: "left",
-
-            originY: "top"
-
-        });
-
-        this.canvas.add(ellipse);
-
-    }
-
-    drawText(node) {
-
-        const text = new fabric.IText(node.text, {
-
-            left: node.transform.x,
-
-            top: node.transform.y,
-
-            fontSize: node.fontSize,
-
-            fontFamily: node.fontFamily,
-
-            fill: node.fill,
-
-            fontWeight: node.fontWeight,
-
-            fontStyle: node.fontStyle,
-
-            textAlign: node.textAlign,
-
-            lineHeight: node.lineHeight
-
-        });
-
-        this.canvas.add(text);
+        );
 
     }
 
     render() {
 
-        console.log("Renderer.render()");
-        console.log("Viewport background:", this.editor.viewport.workspace.background);
+        this.clear();
 
-        this.editor.viewport.applyBackground();
+        // Draw workspace background
+        this.ctx.fillStyle = this.editor.viewport.workspace.background;
 
-        this.renderDocument();
+        this.ctx.fillRect(
+            0,
+            0,
+            this.canvas.width,
+            this.canvas.height
+        );
+
+        this.drawArtboards();
+
+        this.drawNodes();
+
+        this.drawPreview();
+
+        this.drawSelection();
+
+        this.drawSelectionObjects();
+
+        this.drawSelectionBounds();
+
+        this.drawMarquee();
+
+    }
+
+    drawArtboards() {
+
+        const ctx = this.ctx;
+
+        const artboards = this.editor.document.getArtboards();
+
+        artboards.forEach(artboard => {
+
+            ctx.save();
+
+            ctx.fillStyle = artboard.background.color || "#ffffff";
+
+            ctx.strokeStyle = "#d0d0d0";
+
+            ctx.lineWidth = 1;
+
+            ctx.fillRect(
+                artboard.x,
+                artboard.y,
+                artboard.width,
+                artboard.height
+            );
+
+            ctx.strokeRect(
+                artboard.x,
+                artboard.y,
+                artboard.width,
+                artboard.height
+            );
+
+            ctx.restore();
+
+        });
+
+    }
+
+    drawNodes() {
+
+        this.editor.document.traverse(node => {
+
+            switch (node.type) {
+
+                case "rectangle":
+
+                    this.drawRectangle(node);
+
+                    break;
+
+                case "ellipse":
+
+                    this.drawEllipse(node);
+
+                    break;
+
+                case "text":
+
+                    this.drawText(node);
+
+                    break;
+
+            }
+
+        });
+
+    }
+
+    drawSelectionObjects() {
+        this.editor.selection.getSelected().forEach(node => {
+            this.drawSelectionBox(node);
+        });
+    }
+
+    drawSelectionBounds() {
+        const bounds = this.editor.selection.getBounds();
+
+        if (!bounds) return;
+
+        this.drawBounds(bounds);
+        this.drawHandles(bounds);
+    }
+
+    drawBounds(bounds) {
+
+        const ctx = this.ctx;
+
+        ctx.save();
+
+        ctx.strokeStyle = "#4A8DFF";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+
+        ctx.strokeRect(
+            bounds.x,
+            bounds.y,
+            bounds.width,
+            bounds.height
+        );
+
+        ctx.restore();
+
+    }
+
+    drawHandles(bounds) {
+
+        const ctx = this.ctx;
+
+        const size = 8;
+
+        const points = [
+
+            [bounds.x, bounds.y],
+            [bounds.x + bounds.width / 2, bounds.y],
+            [bounds.x + bounds.width, bounds.y],
+
+            [bounds.x, bounds.y + bounds.height / 2],
+            [bounds.x + bounds.width, bounds.y + bounds.height / 2],
+
+            [bounds.x, bounds.y + bounds.height],
+            [bounds.x + bounds.width / 2, bounds.y + bounds.height],
+            [bounds.x + bounds.width, bounds.y + bounds.height]
+
+        ];
+
+        ctx.save();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#4A8DFF";
+        ctx.lineWidth = 1;
+
+        points.forEach(([x, y]) => {
+
+            ctx.beginPath();
+
+            ctx.rect(
+                x - size / 2,
+                y - size / 2,
+                size,
+                size
+            );
+
+            ctx.fill();
+            ctx.stroke();
+
+        });
+
+        ctx.restore();
+
+    }
+
+    drawPreview() {
+
+        if (!this.editor.tools) return;
+
+        const tool = this.editor.tools.getActive();
+
+        if (!tool) return;
+
+        if (!tool.preview) return;
+
+        switch (tool.preview.type) {
+
+            case "rectangle":
+
+                this.drawRectangle(tool.preview);
+
+                break;
+
+            case "ellipse":
+
+                this.drawEllipse(tool.preview);
+
+                break;
+        }
+
+    }
+
+    drawRectangle(rectangle) {
+
+        const ctx = this.ctx;
+
+        const x =
+            rectangle.transform
+                ? rectangle.transform.x
+                : rectangle.x;
+
+        const y =
+            rectangle.transform
+                ? rectangle.transform.y
+                : rectangle.y;
+
+        const width =
+            rectangle.transform
+                ? rectangle.transform.width
+                : rectangle.width;
+
+        const height =
+            rectangle.transform
+                ? rectangle.transform.height
+                : rectangle.height;
+
+        const fill =
+            rectangle.style
+                ? rectangle.style.fill
+                : rectangle.fill;
+
+        const stroke =
+            rectangle.style
+                ? rectangle.style.stroke
+                : rectangle.stroke;
+
+        const strokeWidth =
+            rectangle.style
+                ? rectangle.style.strokeWidth
+                : rectangle.strokeWidth;
+
+        ctx.save();
+
+        ctx.beginPath();
+
+        ctx.rect(
+            x,
+            y,
+            width,
+            height
+        );
+
+        if (fill) {
+
+            ctx.fillStyle = fill;
+
+            ctx.fill();
+
+        }
+
+        if (strokeWidth > 0) {
+
+            ctx.lineWidth = strokeWidth;
+
+            ctx.strokeStyle = stroke;
+
+            ctx.stroke();
+
+        }
+
+        ctx.restore();
+
+    }
+
+    drawEllipse(ellipse) {
+
+        const ctx = this.ctx;
+
+        const t = ellipse.transform;
+
+        ctx.save();
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+
+            t.x + t.width / 2,
+
+            t.y + t.height / 2,
+
+            t.width / 2,
+
+            t.height / 2,
+
+            0,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        if (ellipse.style.fill) {
+
+            ctx.fillStyle = ellipse.style.fill;
+
+            ctx.fill();
+
+        }
+
+        if (ellipse.style.strokeWidth > 0) {
+
+            ctx.lineWidth = ellipse.style.strokeWidth;
+
+            ctx.strokeStyle = ellipse.style.stroke;
+
+            ctx.stroke();
+
+        }
+
+        ctx.restore();
 
     }
 
