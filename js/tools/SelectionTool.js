@@ -32,77 +32,154 @@ export default class SelectionTool extends Tool {
 
     onMouseDown(pointer, event) {
 
+        //
         // Start resizing
+        //
 
-        const handle = this.hitTestHandle(pointer);
+        const handle =
+            this.hitTestHandle(
+                pointer
+            );
 
-        if (handle) {
+        if (
+            handle
+        ) {
 
-            this.beginResize(handle, pointer);
-
-            return;
-
-        }
-
-        const node = this.editor.renderer.hitTest(pointer);
-
-        if (!node) {
-
-            this.dragging = false;
-
-            this.marquee.active = true;
-
-            this.marquee.start = pointer;
-
-            this.marquee.current = pointer;
-
-            this.dragItems = [];
-
-            this.lastPointer = null;
+            this.beginResize(
+                handle,
+                pointer
+            );
 
             return;
 
         }
 
-        const selected = this.editor.selection.getSelected();
+        //
+        // Start rotating
+        //
 
-        if (event.shiftKey) {
+        const rotationCorner =
+            this.hitTestRotationCorner(
+                pointer
+            );
 
-            this.editor.selection.toggle(node);
+        if (
+            rotationCorner
+        ) {
+
+            this.beginRotate(
+                rotationCorner,
+                pointer
+            );
+
+            return;
+
+        }
+
+        //
+        // Hit test object
+        //
+
+        const node =
+            this.editor.renderer.hitTest(
+                pointer
+            );
+
+        if (
+            !node
+        ) {
+
+            this.dragging =
+                false;
+
+            this.marquee.active =
+                true;
+
+            this.marquee.start =
+                pointer;
+
+            this.marquee.current =
+                pointer;
+
+            this.dragItems =
+                [];
+
+            this.lastPointer =
+                null;
+
+            return;
+
+        }
+
+        const selected =
+            this.editor.selection
+                .getSelected();
+
+        if (
+            event.shiftKey
+        ) {
+
+            this.editor.selection
+                .toggle(
+                    node
+                );
+
+            this.editor.panels
+                .updateAll();
 
         } else {
 
-            if (!selected.includes(node)) {
+            if (
+                !selected.includes(
+                    node
+                )
+            ) {
 
-                this.editor.selection.select(node);
+                this.editor.selection
+                    .select(
+                        node
+                    );
+
+                this.editor.panels
+                    .updateAll();
 
             }
 
-            // else:
-            // already selected
-            // keep the whole selection
         }
 
+        //
         // Start dragging
-        this.dragging = true;
+        //
+
+        this.dragging =
+            true;
 
         this.lastPointer = {
 
-            x: pointer.x,
+            x:
+                pointer.x,
 
-            y: pointer.y
+            y:
+                pointer.y
 
         };
 
-        this.dragItems = this.editor.selection.getSelected().map(node => ({
+        this.dragItems =
+            this.editor.selection
+                .getSelected()
+                .map(
+                    node => ({
 
-            node,
+                        node,
 
-            startX: node.transform.x,
+                        startX:
+                            node.transform.x,
 
-            startY: node.transform.y
+                        startY:
+                            node.transform.y
 
-        }));
+                    })
+                );
 
         this.editor.renderer.render();
 
@@ -111,7 +188,7 @@ export default class SelectionTool extends Tool {
     onMouseMove(pointer, event) {
 
         //
-        // Update marquee first
+        // Marquee
         //
 
         if (this.marquee.active) {
@@ -125,10 +202,8 @@ export default class SelectionTool extends Tool {
         }
 
         //
-        // Scale Selected object
+        // Active resize
         //
-
-        const handle = this.hitTestHandle(pointer);
 
         if (this.resizing) {
 
@@ -138,37 +213,89 @@ export default class SelectionTool extends Tool {
 
         }
 
+        //
+        // Active rotation
+        //
+
+        if (this.rotating) {
+
+            this.rotate(pointer);
+
+            return;
+
+        }
+
+        //
+        // Resize handle hover
+        //
+
+        const handle =
+            this.hitTestHandle(pointer);
+
         if (handle) {
 
             switch (handle.name) {
 
                 case "topLeft":
                 case "bottomRight":
-                    this.editor.elements.canvas.style.cursor = "nwse-resize";
+
+                    this.editor.elements.canvas.style.cursor =
+                        "nwse-resize";
+
                     break;
 
                 case "topRight":
                 case "bottomLeft":
-                    this.editor.elements.canvas.style.cursor = "nesw-resize";
+
+                    this.editor.elements.canvas.style.cursor =
+                        "nesw-resize";
+
                     break;
 
                 case "left":
                 case "right":
-                    this.editor.elements.canvas.style.cursor = "ew-resize";
+
+                    this.editor.elements.canvas.style.cursor =
+                        "ew-resize";
+
                     break;
 
                 case "top":
                 case "bottom":
-                    this.editor.elements.canvas.style.cursor = "ns-resize";
+
+                    this.editor.elements.canvas.style.cursor =
+                        "ns-resize";
+
                     break;
 
             }
 
-        } else {
-
-            this.editor.elements.canvas.style.cursor = "default";
+            return;
 
         }
+
+        //
+        // Rotation hover
+        //
+
+        const rotationCorner =
+            this.hitTestRotationCorner(pointer);
+
+        if (rotationCorner) {
+
+            this.editor.elements.canvas.style.cursor =
+                'url("/assets/cursors/rotate-left.svg") 16 16, auto';
+
+            return;
+
+        }
+
+        //
+        // Default cursor
+        //
+
+        this.editor.elements.canvas.style.cursor =
+            "default";
 
         //
         // Move selected objects
@@ -180,18 +307,23 @@ export default class SelectionTool extends Tool {
 
         }
 
-        const dx = pointer.x - this.lastPointer.x;
+        const dx =
+            pointer.x -
+            this.lastPointer.x;
 
-        const dy = pointer.y - this.lastPointer.y;
+        const dy =
+            pointer.y -
+            this.lastPointer.y;
 
-        this.editor.selection.getSelected().forEach(node => {
+        this.editor.selection
+            .getSelected()
+            .forEach(node => {
 
-            node.transform.x += dx;
+                node.transform.x += dx;
 
-            node.transform.y += dy;
+                node.transform.y += dy;
 
-        });
-
+            });
 
         this.lastPointer = {
 
@@ -203,6 +335,8 @@ export default class SelectionTool extends Tool {
 
         this.editor.renderer.render();
 
+        this.editor.panels.updateAll();
+
     }
 
     onMouseUp(pointer, event) {
@@ -211,11 +345,16 @@ export default class SelectionTool extends Tool {
         // Finish marquee
         //
 
-        if (this.marquee.active) {
+        if (
+            this.marquee.active
+        ) {
 
-            this.finishMarquee(event);
+            this.finishMarquee(
+                event
+            );
 
-            this.marquee.active = false;
+            this.marquee.active =
+                false;
 
             this.editor.renderer.render();
 
@@ -223,16 +362,43 @@ export default class SelectionTool extends Tool {
 
         }
 
+        //
+        // Finish resizing
+        //
+
+        if (
+            this.resizing
+        ) {
+
+            this.resizing =
+                false;
+
+            this.resizeSession =
+                null;
+
+            this.editor.panels
+                .updateAll();
+
+            return;
+
+        }
 
         //
-        // Finish Scalling
+        // Finish rotating
         //
 
-        if (this.resizing) {
+        if (
+            this.rotating
+        ) {
 
-            this.resizing = false;
+            this.rotating =
+                false;
 
-            this.resizeSession = null;
+            this.rotationSession =
+                null;
+
+            this.editor.panels
+                .updateAll();
 
             return;
 
@@ -242,11 +408,14 @@ export default class SelectionTool extends Tool {
         // Finish dragging
         //
 
-        this.dragging = false;
+        this.dragging =
+            false;
 
-        this.dragItems = [];
+        this.dragItems =
+            [];
 
-        this.lastPointer = null;
+        this.lastPointer =
+            null;
 
     }
 
@@ -280,7 +449,9 @@ export default class SelectionTool extends Tool {
 
         this.editor.document.traverse(node => {
 
-            if (node.type !== "rectangle") return;
+            if (!["rectangle", "ellipse"].includes(node.type)) {
+                return;
+            }
 
             const t = node.transform;
 
@@ -310,7 +481,9 @@ export default class SelectionTool extends Tool {
 
     hitTestHandle(pointer) {
 
-        const bounds = this.editor.selection.getBounds();
+        const bounds =
+            this.editor.selection
+                .getBounds();
 
         if (!bounds) {
 
@@ -318,72 +491,210 @@ export default class SelectionTool extends Tool {
 
         }
 
-        const size = 8;
+        const handles = [
 
-        const half = size / 2;
-
-        const handles = {
-
-            topLeft: {
+            {
+                name: "topLeft",
                 x: bounds.x,
                 y: bounds.y
             },
 
-            top: {
-                x: bounds.x + bounds.width / 2,
+            {
+                name: "top",
+                x: bounds.x +
+                    bounds.width / 2,
                 y: bounds.y
             },
 
-            topRight: {
-                x: bounds.x + bounds.width,
+            {
+                name: "topRight",
+                x: bounds.x +
+                    bounds.width,
                 y: bounds.y
             },
 
-            left: {
+            {
+                name: "left",
                 x: bounds.x,
-                y: bounds.y + bounds.height / 2
+                y: bounds.y +
+                    bounds.height / 2
             },
 
-            right: {
-                x: bounds.x + bounds.width,
-                y: bounds.y + bounds.height / 2
+            {
+                name: "right",
+                x: bounds.x +
+                    bounds.width,
+                y: bounds.y +
+                    bounds.height / 2
             },
 
-            bottomLeft: {
+            {
+                name: "bottomLeft",
                 x: bounds.x,
-                y: bounds.y + bounds.height
+                y: bounds.y +
+                    bounds.height
             },
 
-            bottom: {
-                x: bounds.x + bounds.width / 2,
-                y: bounds.y + bounds.height
+            {
+                name: "bottom",
+                x: bounds.x +
+                    bounds.width / 2,
+                y: bounds.y +
+                    bounds.height
             },
 
-            bottomRight: {
-                x: bounds.x + bounds.width,
-                y: bounds.y + bounds.height
+            {
+                name: "bottomRight",
+                x: bounds.x +
+                    bounds.width,
+                y: bounds.y +
+                    bounds.height
             }
 
-        };
+        ];
 
-        for (const [name, point] of Object.entries(handles)) {
+        for (
+            const handle
+            of handles
+        ) {
+
+            const distance =
+                Math.hypot(
+
+                    pointer.x -
+                    handle.x,
+
+                    pointer.y -
+                    handle.y
+
+                );
 
             if (
+                distance <= 6
+            ) {
 
-                pointer.x >= point.x - half &&
-                pointer.x <= point.x + half &&
-                pointer.y >= point.y - half &&
-                pointer.y <= point.y + half
+                return handle;
 
+            }
+
+        }
+
+        return null;
+
+    }
+
+    hitTestRotationCorner(pointer) {
+
+        const selected =
+            this.editor.selection
+                .getSelected();
+
+        if (
+            selected.length !== 1
+        ) {
+
+            return null;
+
+        }
+
+        const node =
+            selected[0];
+
+        const t =
+            node.transform;
+
+        const centerX =
+            t.x +
+            t.width / 2;
+
+        const centerY =
+            t.y +
+            t.height / 2;
+
+        const rotation =
+            (t.rotation ?? 0) *
+            Math.PI /
+            180;
+
+        const cos =
+            Math.cos(rotation);
+
+        const sin =
+            Math.sin(rotation);
+
+        const corners = [
+
+            {
+                name: "topLeft",
+                x: t.x,
+                y: t.y
+            },
+
+            {
+                name: "topRight",
+                x: t.x + t.width,
+                y: t.y
+            },
+
+            {
+                name: "bottomRight",
+                x: t.x + t.width,
+                y: t.y + t.height
+            },
+
+            {
+                name: "bottomLeft",
+                x: t.x,
+                y: t.y + t.height
+            }
+
+        ];
+
+        for (
+            const corner
+            of corners
+        ) {
+
+            const dx =
+                corner.x -
+                centerX;
+
+            const dy =
+                corner.y -
+                centerY;
+
+            const x =
+                centerX +
+                dx * cos -
+                dy * sin;
+
+            const y =
+                centerY +
+                dx * sin +
+                dy * cos;
+
+            const distance =
+                Math.hypot(
+
+                    pointer.x - x,
+
+                    pointer.y - y
+
+                );
+
+            if (
+                distance > 4 &&
+                distance <= 15
             ) {
 
                 return {
 
-                    name,
+                    name:
+                        corner.name,
 
-                    x: point.x,
+                    x,
 
-                    y: point.y
+                    y
 
                 };
 
@@ -395,9 +706,35 @@ export default class SelectionTool extends Tool {
 
     }
 
+    getRotationCursor(corner) {
+
+        switch (
+        corner.name
+        ) {
+
+            case "topLeft":
+            case "bottomRight":
+
+                return "nesw-resize";
+
+            case "topRight":
+            case "bottomLeft":
+
+                return "nwse-resize";
+
+            default:
+
+                return "default";
+
+        }
+
+    }
+
     beginResize(handle, pointer) {
 
         this.resizing = true;
+
+        const bounds = this.editor.selection.getBounds();
 
         this.resizeSession = {
 
@@ -411,9 +748,7 @@ export default class SelectionTool extends Tool {
 
             },
 
-            startBounds: structuredClone(
-                this.editor.selection.getBounds()
-            ),
+            startBounds: structuredClone(bounds),
 
             items: this.editor.selection.getSelected().map(node => ({
 
@@ -438,81 +773,132 @@ export default class SelectionTool extends Tool {
         const session = this.resizeSession;
 
         const old = session.startBounds;
-        const newBounds = {
 
-            x: old.x,
-            y: old.y,
-            width: old.width,
-            height: old.height
+        const dx =
+            pointer.x -
+            session.startPointer.x;
 
-        };
+        const dy =
+            pointer.y -
+            session.startPointer.y;
 
+        //
+        // Start with the original four edges
+        //
 
-        const dx = pointer.x - session.startPointer.x;
-        const dy = pointer.y - session.startPointer.y;
+        let left = old.x;
+
+        let right = old.x + old.width;
+
+        let top = old.y;
+
+        let bottom = old.y + old.height;
+
+        //
+        // Move the selected edge
+        //
 
         switch (session.handle) {
 
-            case "right":
-
-                newBounds.width += dx;
-                break;
-
             case "left":
 
-                newBounds.x += dx;
-                newBounds.width -= dx;
+                left += dx;
+
                 break;
 
-            case "bottom":
+            case "right":
 
-                newBounds.height += dy;
+                right += dx;
+
                 break;
 
             case "top":
 
-                newBounds.y += dy;
-                newBounds.height -= dy;
+                top += dy;
+
+                break;
+
+            case "bottom":
+
+                bottom += dy;
+
                 break;
 
             case "topLeft":
 
-                newBounds.x += dx;
-                newBounds.y += dy;
+                left += dx;
 
-                newBounds.width -= dx;
-                newBounds.height -= dy;
+                top += dy;
+
                 break;
 
             case "topRight":
 
-                newBounds.y += dy;
+                right += dx;
 
-                newBounds.width += dx;
-                newBounds.height -= dy;
-                break;
+                top += dy;
 
-            case "bottomRight":
-
-                newBounds.width += dx;
-                newBounds.height += dy;
                 break;
 
             case "bottomLeft":
 
-                newBounds.x += dx;
+                left += dx;
 
-                newBounds.width -= dx;
-                newBounds.height += dy;
+                bottom += dy;
+
+                break;
+
+            case "bottomRight":
+
+                right += dx;
+
+                bottom += dy;
+
                 break;
 
         }
 
-        newBounds.width = Math.max(1, newBounds.width);
-        newBounds.height = Math.max(1, newBounds.height);
+        //
+        // Normalize crossed edges
+        //
 
-        const scaleX = newBounds.width / old.width;
-        const scaleY = newBounds.height / old.height;
+        const newBounds = {
+
+            x: Math.min(left, right),
+
+            y: Math.min(top, bottom),
+
+            width: Math.abs(right - left),
+
+            height: Math.abs(bottom - top)
+
+        };
+
+        //
+        // Prevent zero-size objects
+        //
+
+        newBounds.width =
+            Math.max(1, newBounds.width);
+
+        newBounds.height =
+            Math.max(1, newBounds.height);
+
+        //
+        // Calculate scale relative to the original selection
+        //
+
+        const scaleX =
+            newBounds.width /
+            old.width;
+
+        const scaleY =
+            newBounds.height /
+            old.height;
+
+        //
+        // Scale every selected node
+        //
 
         session.items.forEach(item => {
 
@@ -520,18 +906,158 @@ export default class SelectionTool extends Tool {
 
             const t = item.transform;
 
-            const rx = t.x - old.x;
-            const ry = t.y - old.y;
+            const relativeX =
+                t.x - old.x;
 
-            node.transform.x = newBounds.x + rx * scaleX;
-            node.transform.y = newBounds.y + ry * scaleY;
+            const relativeY =
+                t.y - old.y;
 
-            node.transform.width = t.width * scaleX;
-            node.transform.height = t.height * scaleY;
+            node.transform.x =
+                newBounds.x +
+                relativeX * scaleX;
+
+            node.transform.y =
+                newBounds.y +
+                relativeY * scaleY;
+
+            node.transform.width =
+                t.width * scaleX;
+
+            node.transform.height =
+                t.height * scaleY;
 
         });
 
         this.editor.renderer.render();
+
+        this.editor.panels.updateAll();
+
+    }
+
+    beginRotate(
+        corner,
+        pointer
+    ) {
+
+        const selected =
+            this.editor.selection
+                .getSelected();
+
+        if (
+            selected.length !== 1
+        ) {
+
+            return;
+
+        }
+
+        const node =
+            selected[0];
+
+        const t =
+            node.transform;
+
+        const centerX =
+            t.x +
+            t.width / 2;
+
+        const centerY =
+            t.y +
+            t.height / 2;
+
+        const startAngle =
+            Math.atan2(
+
+                pointer.y -
+                centerY,
+
+                pointer.x -
+                centerX
+
+            );
+
+        this.rotating =
+            true;
+
+        this.rotationSession = {
+
+            node,
+
+            centerX,
+
+            centerY,
+
+            startAngle,
+
+            startRotation:
+                t.rotation ?? 0
+
+        };
+
+    }
+
+    rotate(
+        pointer
+    ) {
+
+        if (
+            !this.rotating ||
+            !this.rotationSession
+        ) {
+
+            return;
+
+        }
+
+        const session =
+            this.rotationSession;
+
+        const currentAngle =
+            Math.atan2(
+
+                pointer.y -
+                session.centerY,
+
+                pointer.x -
+                session.centerX
+
+            );
+
+        let deltaAngle =
+            currentAngle -
+            session.startAngle;
+
+        if (
+            deltaAngle > Math.PI
+        ) {
+
+            deltaAngle -=
+                Math.PI * 2;
+
+        }
+
+        if (
+            deltaAngle < -Math.PI
+        ) {
+
+            deltaAngle +=
+                Math.PI * 2;
+
+        }
+
+        session.node
+            .transform
+            .rotation =
+
+            session.startRotation +
+
+            deltaAngle *
+            180 /
+            Math.PI;
+
+        this.editor.renderer.render();
+
+        this.editor.panels.updateAll();
 
     }
 

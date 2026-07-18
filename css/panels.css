@@ -191,3 +191,98 @@
     border-radius:4px;
 
 }
+
+
+
+
+/*=========================================*/
+/* Temporaty code */
+/*=========================================*/
+
+.editor-panel {
+
+    display: block;
+
+    width: 100%;
+
+}
+
+.panel-content {
+    height: max-content;
+
+    background-color: #1d1d1d;
+
+    display: block;
+
+    visibility: visible;
+
+    opacity: 1;
+
+    padding: 12px;
+
+}
+
+.collapsed .panel-content {
+    display: none;
+}
+
+.property-empty {
+
+    display: block;
+
+    visibility: visible;
+
+    opacity: 1;
+
+    padding: 12px;
+
+}
+
+.property-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.property-grid .property-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+
+}
+
+.property-grid .property-field span {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: small;
+}
+.property-grid .property-field input{
+    text-align: center;
+    width: 100px;
+    border: 1px solid black;
+    border-radius: 5px;
+    color: aliceblue;
+    background-color: #252526;
+}
+.property-grid .property-field input:hover {
+    background-color: #1d1d1d;
+}
+.property-grid .property-field input:focus {
+    background-color: #1d1d1d;
+}
+
+.property-field input[type="number"] {
+
+    appearance: textfield;
+
+    -moz-appearance: textfield;
+
+}
+
+.property-field input[type="number"]::-webkit-inner-spin-button,
+.property-field input[type="number"]::-webkit-outer-spin-button {
+
+    -webkit-appearance: none;
+
+    margin: 0;
+
+}

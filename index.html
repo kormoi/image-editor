@@ -49,7 +49,7 @@
 
                 <button class="menu-item">View</button>
 
-                <button class="menu-item">Effect</button>
+                <button class="menu-item">Window</button>
 
                 <button class="menu-item">Help</button>
             </div>
@@ -119,73 +119,132 @@
                 <!-- Workspace Overlay -->
 
                 <nav id="toolbar">
+
                     <div id="toolbar-handle">
                         ⋮⋮⋮⋮⋮⋮⋮⋮
                     </div>
-                    <button data-tool="select" title="Select">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-select"></use>
-                        </svg>
-                    </button>
 
-                    <button data-tool="node" title="Node">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-node"></use>
-                        </svg>
-                    </button>
+                    <!-- Selection -->
 
-                    <button data-tool="pen" title="Pen">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-pen"></use>
-                        </svg>
-                    </button>
+                    <div class="tool-group">
 
-                    <button data-tool="rectangle" title="Rectangle">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-rectangle"></use>
-                        </svg>
-                    </button>
+                        <button class="tool-button has-group active" data-group="selection" data-tool="select"
+                            title="Selection">
 
-                    <button data-tool="ellipse" title="Ellipse">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-ellipse"></use>
-                        </svg>
-                    </button>
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-select"></use>
+                            </svg>
 
-                    <button data-tool="text" title="Text">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-text"></use>
-                        </svg>
-                    </button>
+                        </button>
 
-                    <button data-tool="image" title="Image">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-image"></use>
-                        </svg>
-                    </button>
+                    </div>
 
-                    <button data-tool="crop" title="Crop">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-crop"></use>
-                        </svg>
-                    </button>
+                    <!-- Shapes -->
 
-                    <button data-tool="brush" title="Brush">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-brush"></use>
-                        </svg>
-                    </button>
+                    <div class="tool-group">
 
-                    <button data-tool="eraser" title="Eraser">
-                        <svg class="tool-icon">
-                            <use href="assets/icons.svg#icon-eraser"></use>
-                        </svg>
-                    </button>
+                        <button class="tool-button has-group" data-group="shape" data-tool="rectangle"
+                            title="Rectangle">
 
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-rectangle"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Pen -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button has-group" data-group="pen" data-tool="pen" title="Pen">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-pen"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Text -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button" data-tool="text" title="Text">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-text"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Image -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button" data-tool="image" title="Image">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-image"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Crop -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button" data-tool="crop" title="Crop">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-crop"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Brush -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button" data-tool="brush" title="Brush">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-brush"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Eraser -->
+
+                    <div class="tool-group">
+
+                        <button class="tool-button" data-tool="eraser" title="Eraser">
+
+                            <svg class="tool-icon">
+                                <use href="assets/icons.svg#icon-eraser"></use>
+                            </svg>
+
+                        </button>
+
+                    </div>
 
                 </nav>
 
+                <!-- Shared Flyout -->
 
+                <div id="tool-flyout" hidden>
+
+                </div>
 
                 <!-- Workspace View -->
 

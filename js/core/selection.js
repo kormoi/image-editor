@@ -76,37 +76,96 @@ export default class Selection {
 
     getBounds() {
 
-        if (!this.nodes.length) {
+        if (
+            !this.nodes.length
+        ) {
 
             return null;
 
         }
 
-        let left = Infinity;
-        let top = Infinity;
-        let right = -Infinity;
-        let bottom = -Infinity;
+        let left =
+            Infinity;
 
-        this.nodes.forEach(node => {
+        let top =
+            Infinity;
 
-            const t = node.transform;
+        let right =
+            -Infinity;
 
-            left = Math.min(left, t.x);
-            top = Math.min(top, t.y);
+        let bottom =
+            -Infinity;
 
-            right = Math.max(right, t.x + t.width);
-            bottom = Math.max(bottom, t.y + t.height);
+        this.nodes.forEach(
+            node => {
 
-        });
+                const t =
+                    node.transform;
 
-        return {
+                left =
+                    Math.min(
+                        left,
+                        t.x
+                    );
 
-            x: left,
-            y: top,
-            width: right - left,
-            height: bottom - top
+                top =
+                    Math.min(
+                        top,
+                        t.y
+                    );
+
+                right =
+                    Math.max(
+                        right,
+                        t.x +
+                        t.width
+                    );
+
+                bottom =
+                    Math.max(
+                        bottom,
+                        t.y +
+                        t.height
+                    );
+
+            }
+        );
+
+        const bounds = {
+
+            x:
+                left,
+
+            y:
+                top,
+
+            width:
+                right -
+                left,
+
+            height:
+                bottom -
+                top
 
         };
+
+        if (
+            this.nodes.length === 1
+        ) {
+
+            bounds.rotation =
+                this.nodes[0]
+                    .transform
+                    .rotation ?? 0;
+
+        } else {
+
+            bounds.rotation =
+                0;
+
+        }
+
+        return bounds;
 
     }
 

@@ -2,11 +2,13 @@
 
 <!-- Select -->
 <symbol id="icon-select" viewBox="0 0 24 24">
-    <path d="M5 3L18 16L13 17L11 22L8.5 15.5L3 13Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linejoin="round"/>
+    <path
+        d="M5 3L19 12L13.2 13.2L16.5 20L13.5 21L10.3 14.2L5 18Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+    />
 </symbol>
 
 <!-- Node -->
@@ -14,85 +16,156 @@
     <circle cx="6" cy="6" r="2" fill="currentColor"/>
     <circle cx="18" cy="6" r="2" fill="currentColor"/>
     <circle cx="12" cy="18" r="2" fill="currentColor"/>
-    <path d="M8 6H16M7 8L11 16M17 8L13 16"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <path d="M8 6H16M7 8L11 16M17 8L13 16" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
 <!-- Pen -->
 <symbol id="icon-pen" viewBox="0 0 24 24">
-    <path d="M5 19L9 18L19 8L16 5L6 15L5 19Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"/>
+
+    <!-- Left outlined side -->
+    <path
+        d="M4 20
+           L12 3
+           L12 15
+           Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+    />
+
+    <!-- Right filled side -->
+    <path
+        d="M12 3
+           L12 15
+           L20 20
+           Z"
+        fill="currentColor"
+    />
+
+    <!-- Top diamond -->
+    <path
+        d="M12 1.5
+           L14.5 4
+           L12 6.5
+           L9.5 4
+           Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+    />
+
 </symbol>
 
 <!-- Rectangle -->
 <symbol id="icon-rectangle" viewBox="0 0 24 24">
-    <rect x="4" y="6" width="16" height="12"
-          rx="1"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <rect x="4" y="6" width="16" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
 <!-- Ellipse -->
 <symbol id="icon-ellipse" viewBox="0 0 24 24">
-    <ellipse cx="12"
-             cy="12"
-             rx="8"
-             ry="6"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"/>
+    <ellipse cx="12" cy="12" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
 <!-- Text -->
 <symbol id="icon-text" viewBox="0 0 24 24">
-    <path d="M5 5H19M12 5V19"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <path d="M5 5H19M12 5V19" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
 <!-- Image -->
 <symbol id="icon-image" viewBox="0 0 24 24">
-    <rect x="3"
-          y="4"
-          width="18"
-          height="16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <rect x="3" y="4" width="18" height="16" fill="none" stroke="currentColor" stroke-width="2"/>
     <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
-    <path d="M5 17L10 12L14 16L17 13L20 17"
-          stroke="currentColor"
-          stroke-width="2"
-          fill="none"/>
+    <path d="M5 17L10 12L14 16L17 13L20 17" stroke="currentColor" stroke-width="2" fill="none"/>
 </symbol>
 
 <!-- Crop -->
 <symbol id="icon-crop" viewBox="0 0 24 24">
-    <path d="M7 3V17A4 4 0 0011 21H21
-             M3 7H17A4 4 0 0121 11V21"
-          stroke="currentColor"
-          stroke-width="2"
-          fill="none"/>
+    <path d="M7 3V17A4 4 0 0011 21H21              M3 7H17A4 4 0 0121 11V21" stroke="currentColor" stroke-width="2" fill="none"/>
 </symbol>
 
 <!-- Brush -->
 <symbol id="icon-brush" viewBox="0 0 24 24">
-    <path d="M14 5L19 10L10 19C9 20 7 20 6 19C5 18 5 16 6 15L14 5Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <path d="M14 5L19 10L10 19C9 20 7 20 6 19C5 18 5 16 6 15L14 5Z" fill="none" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
 <!-- Eraser -->
 <symbol id="icon-eraser" viewBox="0 0 24 24">
-    <path d="M7 17L14 10L19 15L15 19H9L7 17Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"/>
+    <path d="M7 17L14 10L19 15L15 19H9L7 17Z" fill="none" stroke="currentColor" stroke-width="2"/>
 </symbol>
 
+<!-- Line --><symbol id="icon-line" viewBox="0 0 24 24"><path d="M4 20L20 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><!-- Brush --><symbol id="icon-brush" viewBox="0 0 24 24"><path d="M4 20c2-3 4-5 7-6l7-7 2 2-7 7c-1 3-3 5-6 7-2 1-4 0-4-2 0-1 1-1 2-1 1 0 2 1 2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<!-- Point / Direct Selection -->
+<symbol id="icon-point" viewBox="0 0 24 24">
+    <path
+        d="M7 4L18.5 12L13.2 13.1L15.8 19.5L13.2 20.5L10.6 14.1L7 17Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linejoin="round"
+    />
+</symbol>
+
+<!-- Convert Point -->
+<symbol id="icon-convert-point" viewBox="0 0 24 24">
+    <path
+        d="M12 3
+            L4 20
+            L12 15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+    <!-- Right filled wedge -->
+    <path
+        d="M12 3
+            L12 15
+            L20 20
+            Z"
+        fill="currentColor"
+    />
+
+    <!-- Angular conversion cut / point transition -->
+    <path
+        d="M12 3 L12 15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+    />
+
+    <!-- Top diamond anchor -->
+    <path
+        d="M12 1.5
+            L14.5 4
+            L12 6.5
+            L9.5 4
+            Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+    />
+
+    <!-- Two straight conversion direction lines, no circles -->
+    <path
+        d="M12 15 L7 10"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M12 15 L17 10"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+    />
+</symbol>
 </svg>

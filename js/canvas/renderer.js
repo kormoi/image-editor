@@ -73,7 +73,9 @@ export default class Renderer {
 
         for (const node of nodes) {
 
-            if (node.type !== "rectangle") continue;
+            if (!["rectangle", "ellipse"].includes(node.type)) {
+                continue;
+            }
 
             const t = node.transform;
 
@@ -114,23 +116,54 @@ export default class Renderer {
 
     drawSelectionBox(node) {
 
-        const ctx = this.ctx;
+        const ctx =
+            this.ctx;
 
-        const t = node.transform;
+        const t =
+            node.transform;
+
+        const centerX =
+            t.x +
+            t.width / 2;
+
+        const centerY =
+            t.y +
+            t.height / 2;
+
+        const rotation =
+            (t.rotation ?? 0) *
+            Math.PI /
+            180;
 
         ctx.save();
 
-        ctx.strokeStyle = "#000000";
+        ctx.translate(
+            centerX,
+            centerY
+        );
 
-        ctx.lineWidth = 1;
+        ctx.rotate(
+            rotation
+        );
+
+        ctx.strokeStyle =
+            "#000000";
+
+        ctx.lineWidth =
+            1;
 
         ctx.setLineDash([]);
 
         ctx.strokeRect(
-            t.x,
-            t.y,
+
+            -t.width / 2,
+
+            -t.height / 2,
+
             t.width,
+
             t.height
+
         );
 
         ctx.restore();
@@ -361,19 +394,54 @@ export default class Renderer {
 
     drawBounds(bounds) {
 
-        const ctx = this.ctx;
+        const ctx =
+            this.ctx;
+
+        const centerX =
+            bounds.x +
+            bounds.width / 2;
+
+        const centerY =
+            bounds.y +
+            bounds.height / 2;
+
+        const rotation =
+            (bounds.rotation ?? 0) *
+            Math.PI /
+            180;
 
         ctx.save();
 
-        ctx.strokeStyle = "#4A8DFF";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
+        ctx.translate(
+            centerX,
+            centerY
+        );
+
+        ctx.rotate(
+            rotation
+        );
+
+        ctx.strokeStyle =
+            "#4A8DFF";
+
+        ctx.lineWidth =
+            1;
+
+        ctx.setLineDash([
+            5,
+            5
+        ]);
 
         ctx.strokeRect(
-            bounds.x,
-            bounds.y,
+
+            -bounds.width / 2,
+
+            -bounds.height / 2,
+
             bounds.width,
+
             bounds.height
+
         );
 
         ctx.restore();
@@ -382,46 +450,164 @@ export default class Renderer {
 
     drawHandles(bounds) {
 
-        const ctx = this.ctx;
+        const ctx =
+            this.ctx;
 
-        const size = 8;
+        const size =
+            8;
+
+        const centerX =
+            bounds.x +
+            bounds.width / 2;
+
+        const centerY =
+            bounds.y +
+            bounds.height / 2;
+
+        const rotation =
+            (bounds.rotation ?? 0) *
+            Math.PI /
+            180;
+
+        const cos =
+            Math.cos(rotation);
+
+        const sin =
+            Math.sin(rotation);
+
+        const rotatePoint =
+            (x, y) => {
+
+                const dx =
+                    x - centerX;
+
+                const dy =
+                    y - centerY;
+
+                return {
+
+                    x:
+                        centerX +
+                        dx * cos -
+                        dy * sin,
+
+                    y:
+                        centerY +
+                        dx * sin +
+                        dy * cos
+
+                };
+
+            };
 
         const points = [
 
-            [bounds.x, bounds.y],
-            [bounds.x + bounds.width / 2, bounds.y],
-            [bounds.x + bounds.width, bounds.y],
+            [
+                bounds.x,
+                bounds.y
+            ],
 
-            [bounds.x, bounds.y + bounds.height / 2],
-            [bounds.x + bounds.width, bounds.y + bounds.height / 2],
+            [
+                centerX,
+                bounds.y
+            ],
 
-            [bounds.x, bounds.y + bounds.height],
-            [bounds.x + bounds.width / 2, bounds.y + bounds.height],
-            [bounds.x + bounds.width, bounds.y + bounds.height]
+            [
+                bounds.x +
+                bounds.width,
+
+                bounds.y
+            ],
+
+            [
+
+                bounds.x,
+
+                centerY
+
+            ],
+
+            [
+
+                bounds.x +
+                bounds.width,
+
+                centerY
+
+            ],
+
+            [
+
+                bounds.x,
+
+                bounds.y +
+                bounds.height
+
+            ],
+
+            [
+
+                centerX,
+
+                bounds.y +
+                bounds.height
+
+            ],
+
+            [
+
+                bounds.x +
+                bounds.width,
+
+                bounds.y +
+                bounds.height
+
+            ]
 
         ];
 
         ctx.save();
 
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#4A8DFF";
-        ctx.lineWidth = 1;
+        ctx.fillStyle =
+            "#ffffff";
 
-        points.forEach(([x, y]) => {
+        ctx.strokeStyle =
+            "#4A8DFF";
 
-            ctx.beginPath();
+        ctx.lineWidth =
+            1;
 
-            ctx.rect(
-                x - size / 2,
-                y - size / 2,
-                size,
-                size
-            );
+        points.forEach(
+            ([x, y]) => {
 
-            ctx.fill();
-            ctx.stroke();
+                const point =
+                    rotatePoint(
+                        x,
+                        y
+                    );
 
-        });
+                ctx.beginPath();
+
+                ctx.rect(
+
+                    point.x -
+                    size / 2,
+
+                    point.y -
+                    size / 2,
+
+                    size,
+
+                    size
+
+                );
+
+                ctx.fill();
+
+                ctx.stroke();
+
+            }
+        );
 
         ctx.restore();
 
@@ -478,6 +664,11 @@ export default class Renderer {
                 ? rectangle.transform.height
                 : rectangle.height;
 
+        const rotation =
+            rectangle.transform
+                ? rectangle.transform.rotation ?? 0
+                : rectangle.rotation ?? 0;
+
         const fill =
             rectangle.style
                 ? rectangle.style.fill
@@ -495,28 +686,56 @@ export default class Renderer {
 
         ctx.save();
 
+        //
+        // Move origin to rectangle center
+        //
+
+        ctx.translate(
+            x + width / 2,
+            y + height / 2
+        );
+
+        //
+        // Rotate degrees → radians
+        //
+
+        ctx.rotate(
+            rotation *
+            Math.PI /
+            180
+        );
+
         ctx.beginPath();
 
+        //
+        // Draw around the center
+        //
+
         ctx.rect(
-            x,
-            y,
+            -width / 2,
+            -height / 2,
             width,
             height
         );
 
         if (fill) {
 
-            ctx.fillStyle = fill;
+            ctx.fillStyle =
+                fill;
 
             ctx.fill();
 
         }
 
-        if (strokeWidth > 0) {
+        if (
+            strokeWidth > 0
+        ) {
 
-            ctx.lineWidth = strokeWidth;
+            ctx.lineWidth =
+                strokeWidth;
 
-            ctx.strokeStyle = stroke;
+            ctx.strokeStyle =
+                stroke;
 
             ctx.stroke();
 
@@ -528,19 +747,48 @@ export default class Renderer {
 
     drawEllipse(ellipse) {
 
-        const ctx = this.ctx;
+        const ctx =
+            this.ctx;
 
-        const t = ellipse.transform;
+        const t =
+            ellipse.transform;
+
+        const rotation =
+            t.rotation ?? 0;
 
         ctx.save();
+
+        //
+        // Move origin to ellipse center
+        //
+
+        ctx.translate(
+
+            t.x + t.width / 2,
+
+            t.y + t.height / 2
+
+        );
+
+        //
+        // Rotate degrees → radians
+        //
+
+        ctx.rotate(
+
+            rotation *
+            Math.PI /
+            180
+
+        );
 
         ctx.beginPath();
 
         ctx.ellipse(
 
-            t.x + t.width / 2,
+            0,
 
-            t.y + t.height / 2,
+            0,
 
             t.width / 2,
 
@@ -554,19 +802,26 @@ export default class Renderer {
 
         );
 
-        if (ellipse.style.fill) {
+        if (
+            ellipse.style.fill
+        ) {
 
-            ctx.fillStyle = ellipse.style.fill;
+            ctx.fillStyle =
+                ellipse.style.fill;
 
             ctx.fill();
 
         }
 
-        if (ellipse.style.strokeWidth > 0) {
+        if (
+            ellipse.style.strokeWidth > 0
+        ) {
 
-            ctx.lineWidth = ellipse.style.strokeWidth;
+            ctx.lineWidth =
+                ellipse.style.strokeWidth;
 
-            ctx.strokeStyle = ellipse.style.stroke;
+            ctx.strokeStyle =
+                ellipse.style.stroke;
 
             ctx.stroke();
 

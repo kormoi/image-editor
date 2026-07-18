@@ -1,6 +1,7 @@
 import Renderer from "../canvas/Renderer.js";
 import Document from "./document.js";
 import ToolManager from "../tools/ToolManager.js";
+import Toolbar from "../ui/Toolbar.js";
 import SelectionTool from "../tools/SelectionTool.js";
 import RectangleTool from "../tools/RectangleTool.js";
 import EllipseTool from "../tools/EllipseTool.js";
@@ -11,7 +12,8 @@ import Selection from "./Selection.js";
 import Transform from "./Transform.js";
 import ToolbarManager from "../ui/ToolbarManager.js";
 import ThemeManager from "./ThemeManager.js";
-
+import PanelManager from "../panels/PanelManager.js";
+import PropertyPanel from "../panels/PropertyPanel.js";
 
 
 export default class Editor {
@@ -37,6 +39,7 @@ export default class Editor {
         this.clipboard = null;
         this.project = null;
         this.toolbarManager = null;
+        this.toolbar = null;
         this.themeManager = null;
         this.panels = null;
         this.ui = null;
@@ -72,6 +75,7 @@ export default class Editor {
         await this.initializeHistory();
         await this.initializeTransform();
         await this.initializeRenderer();
+        await this.initializePanels();
         await this.initializeViewport();
 
         // Optional
@@ -80,6 +84,7 @@ export default class Editor {
 
         await this.initializeTools();
         await this.initializeToolbarManager();
+        await this.initializeToolbar();
         await this.initializeThemeManager();
 
         this.bindToolbar();
@@ -98,6 +103,48 @@ export default class Editor {
 
     }
 
+    initializeToolbar() {
+
+        this.toolbar = new Toolbar(this);
+
+    }
+    initializePanels() {
+
+        this.panels =
+            new PanelManager(this);
+
+        const panelDefinitions = [
+
+            {
+                id: "properties",
+                title: "Properties",
+                active: true,
+                PanelClass: PropertyPanel
+            }
+
+        ];
+
+        panelDefinitions.forEach(
+            definition => {
+
+                const panel =
+                    new definition.PanelClass(
+                        this,
+                        definition
+                    );
+
+                panel.active =
+                    definition.active;
+
+                this.panels.register(
+                    definition.id,
+                    panel
+                );
+
+            }
+        );
+
+    }
     async initializeToolbarManager() {
 
         this.toolbarManager = new ToolbarManager(this);
